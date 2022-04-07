@@ -1,5 +1,9 @@
 Codes to remember
 
+######## -- 8 Bit Number
+$$$$$$$$ -- 8 bit Address
+@@@@     -- 4 Bit Relative Branch Address
+
 Registers:
 A
 00
@@ -10,6 +14,11 @@ C
 D
 11
 
+Used Categories:
+    A -> Arithmetic Addition
+    B -> Arithmetic Subtracting
+    C -> Register operands
+
 Arithmetic Operations:
     Adding:
         All operands will start with A
@@ -17,7 +26,10 @@ Arithmetic Operations:
         Odd Numbers means non-immediate command
         Incrementing will fall under this category
     Subtracting:
-        All operands will start with 
+        All operands will start with B
+        Even Numbers following B will be Immediate
+        Odd nums following B will be non-immediate
+        Decrementing will fall under this category
 Memory and Registers:
     Registers:
         LD(R): 11 (R) (MEM)
@@ -25,5 +37,11 @@ Memory and Registers:
 
         ST(R) 00 (R) (MEM)
         ST(R) 010 (R) 000 (NUM)
+
+        T(R)(R) : 1101 (R) (R)
+    
+    StackOps:
+        PSH: 
+        POP:
 
     

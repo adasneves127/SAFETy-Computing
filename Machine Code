@@ -1,1 +1,69 @@
 Machine Code:
+ADD:
+   (10100000 xx00xx00)              A0 (R1)(R2) -- Add 2 registers
+   (101010xx ########)              A1 (0b10) (R1) (I1 (8b)) -- Add Immediate
+   (10100011 $$$$$$$$ #########)    A3 (MEM) (I1 (8b)) -- Add Immediate to Memory Address
+    
+
+SUB:
+    (10100101 xx00xx00)             A5 (R1)(R2) -- Subtract R2 from R1
+    (101001xx $$$$$$$$ ########)    A6 (0b01) (R1)  (I1 (8b)) -- Subtract Immediate
+    (10101001 $$$$$$$$ #########)   A9 (MEM) (I1 (8b)) -- Sub Immediate to Memory Address
+    
+
+INC:
+    (10100010 xx000000)             A2 (R1) 00  -- Increment R1 
+    (10100100 $$$$$$$$)             A4 (MEM) -- Increment Memory Address
+    
+
+DEC:
+    (10100111 xx000000)             A7 (R1) 00 -- Decrement R1
+    (10101111 $$$$$$$$)             A8 (MEM) -- Decrement Memory Address
+
+
+TRANSFER:
+    (11000000 xx00xx00)             C0 (R1) 00 (R2) 00
+
+PSH:
+    (11000001 xx000000)             C1 (R1)
+
+POP:
+    (11000010 xx000000)             C2 (R1)
+
+LOAD:
+                                    (4, 5, 5, 6)
+    (110001xx ########)             C (0b01) (R1)   (I1 (8b))
+
+                                    (8, 9, A, B)
+    (110010xx $$$$$$$$)             C (0b10) (R1)   (MEM) 0000
+
+
+STORE:
+                                    (C, D, E, F)
+    (110011xx $$$$$$$$)             C (0b11) (R1)   (MEM)
+
+Comparing and Branching:
+CMP:
+    (1101xxxx) D (R1) (R2)  -- Compare 2 registers
+
+CPI:
+    (1110 xxxx) E (0b01) (R1)  -- Compare 1 register and 1 immediate
+
+BNE
+
+BEQ
+GLT
+GLE
+GGT
+GGE
+
+
+
+
+
+Memory Ops:
+    Increment Page:
+    (11110000)                      F0
+
+    Decrement Page
+    (11110001)                      F1
