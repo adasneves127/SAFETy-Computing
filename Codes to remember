@@ -1,0 +1,29 @@
+Codes to remember
+
+Registers:
+A
+00
+B
+01
+C
+10
+D
+11
+
+Arithmetic Operations:
+    Adding:
+        All operands will start with A
+        Even Number means Immediate Command
+        Odd Numbers means non-immediate command
+        Incrementing will fall under this category
+    Subtracting:
+        All operands will start with 
+Memory and Registers:
+    Registers:
+        LD(R): 11 (R) (MEM)
+        LD(R): 101 (R) 000 (NUM)
+
+        ST(R) 00 (R) (MEM)
+        ST(R) 010 (R) 000 (NUM)
+
+    

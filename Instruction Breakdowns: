@@ -1,6 +1,7 @@
 Instruction Breakdowns:
 
-ADD (R1) (R2):  #Adding 2 Registers
+A1 (4 bit) (R1) (R2)
+(1 Byte) ADD (R1) (R2):  #Adding 2 Registers
     MV R1, A    #Move R1 to A. This doesn't preserve A, as A will be the result from the operation
     PUSH B      #Push B to save it
     MV R2, B    #Move R2 to B
@@ -8,4 +9,11 @@ ADD (R1) (R2):  #Adding 2 Registers
     MV B, R2    #Move B back to R2
     POP B       #Restore B
 
-ADI 
+A3 
+(2 Byte) ADI (R1) (N1):
+    PUSH B
+    LDB N1
+    MV R1, A
+    ADD A, B
+    POP B   
+

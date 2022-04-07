@@ -54,8 +54,8 @@ then it will do LI(A, B, X, Y), otherwise, LD(A, B, X, Y)
 -----------------------------------------------
 
 
-ST(A, B, X, Y) Store mem address into Register
-SI(A, B, X, Y) Store Integer into Register
+ST(A, B, X, Y) Store Register into Mem
+SI(A, B, X, Y) Store Integer into Mem
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 These 2 commands will be accessed as LD(A, B, X, Y). 
 If you provide a number for the seccond operand, 
