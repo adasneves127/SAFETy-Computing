@@ -1,0 +1,11 @@
+Instruction Breakdowns:
+
+ADD (R1) (R2):  #Adding 2 Registers
+    MV R1, A    #Move R1 to A. This doesn't preserve A, as A will be the result from the operation
+    PUSH B      #Push B to save it
+    MV R2, B    #Move R2 to B
+    ADD A, B    #Add B to A
+    MV B, R2    #Move B back to R2
+    POP B       #Restore B
+
+ADI 
