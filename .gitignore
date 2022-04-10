@@ -1,1 +1,5 @@
 .history
+bin
+lib
+.classpath
+run.sh

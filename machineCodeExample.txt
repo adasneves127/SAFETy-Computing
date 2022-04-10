@@ -87,9 +87,6 @@ LSL -- Rotate Right
 LSR -- Rotate Left
 
 
-Instruction not needed:
-INC reg
-DEC reg
 
 
 

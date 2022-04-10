@@ -4,6 +4,11 @@ Codes to remember
 $$$$$$$$ -- 8 bit Address
 @@@@     -- 4 Bit Relative Branch Address
 
+Directives:
+.org -- Place this at this memory Address
+.lab -- Set this line to be a label
+.db -- Create a databyte (NOT IMPLEMENTED YET!)
+
 Registers:
 A
 00
