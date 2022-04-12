@@ -66,3 +66,15 @@ All noteable changes for this project will be documented within this file.
 ### Removed
 
 - Removed memory page instructions
+
+## [V1.6.1]
+
+### Added
+
+- Added more instructions to the compiler
+
+### Removed
+- Removed Java simulator. This is to be changed into C.
+
+### Changed
+- Changed instruction codes to prevent potential conflicts.
