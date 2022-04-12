@@ -76,6 +76,7 @@ CurrentAddress = 0
 
 outputListing = {}
 output = [""] * 65536
+linesToResolve = []
 
 def processDirective(directive):
     global output
@@ -91,6 +92,9 @@ def processDirective(directive):
             print(".ORG Address: " + str(directive[1]))
             sys.exit(1)
         CurrentAddress = int(directive[1])
+    if directive[0].upper() == ".LAB":
+        currentLabel = {CurrentAddress: directive[1]}
+        labelAddresses.update(currentLabel)
     pass
 
 outFile = "a.dml"
@@ -143,7 +147,7 @@ with open(fileName) as fileReader:
         isImmediate = False;
         RegisterA = ""
         RegisterB = ""
-        MemAddress = 0
+        MemAddress = -1
         currentLine = line.split(" ")
         
         for index in range(0, len(currentLine)):
@@ -206,6 +210,69 @@ with open(fileName) as fileReader:
                 RegisterB = currentLine[2]
             else:
                 isImmediate = True;
+        elif Instruction[0] == "T":
+            currentInstruction = "TRANS"
+            RegisterA = Instruction[1]
+            RegisterB = Instruction[2]
+        elif Instruction == "JMP":
+            currentInstruction = "JUMP"
+            if len(currentLine) == 2 and len(currentLine[1]) == 4:
+                MemAddress = currentLine[1]
+            else:
+                try:
+                    MemAddress = labelAddresses[currentLine[1]]
+                except:
+                    linesToResolve.append(CurrentAddress)
+        elif Instruction == "JSB":
+            currentInstruction = "JSB"
+            if len(currentLine) == 2 and len(currentLine[1]) == 4:
+                MemAddress = currentLine[1]
+            else:
+                try:
+                    MemAddress = labelAddresses[currentLine[1]]
+                except:
+                    linesToResolve.append(CurrentAddress)
+        elif Instruction == "JSE":
+            currentInstruction = "JSE"
+            if len(currentLine) == 2 and len(currentLine[1]) == 4:
+                MemAddress = currentLine[1]
+            else:
+                try:
+                    MemAddress = labelAddresses[currentLine[1]]
+                except:
+                    linesToResolve.append(CurrentAddress)
+        elif Instruction == "JSN":
+            currentInstruction = "JSN"
+            if len(currentLine) == 2 and len(currentLine[1]) == 4:
+                MemAddress = currentLine[1]
+            else:
+                try:
+                    MemAddress = labelAddresses[currentLine[1]]
+                except:
+                    linesToResolve.append(CurrentAddress)
+        elif Instruction == "JSR":
+            currentInstruction = "JSR"
+            if len(currentLine) == 2 and len(currentLine[1]) == 4:
+                MemAddress = currentLine[1]
+            else:
+                try:
+                    MemAddress = labelAddresses[currentLine[1]]
+                except:
+                    linesToResolve.append(CurrentAddress)
+        elif Instruction == "RET":
+            currentInstruction = "RET"
+        elif Instruction == "HLT":
+            currentInstruction = "HLT"
+        elif Instruction == "NOP":
+            currentInstruction = "NOP"
+        elif Instruction == "BRK":
+            currentInstruction = "BRK"
+        elif Instruction == "RST":
+            currentInstruction = "RST"
+
+                
+        else:
+            assert "Invalid Instruction " + Instruction + " at address " + str(CurrentAddress)
         
 
         #Convert Key Components to ML
@@ -216,8 +283,7 @@ with open(fileName) as fileReader:
                 if(isImmediate):
                     match RegisterA:
                         case "A":
-                            output[CurrentAddress] = hex(0b11000100).split("0x")[1]
-                            
+                            output[CurrentAddress] = hex(0b11000100).split("0x")[1]     
                         case "B":
                             output[CurrentAddress] = hex(0b11000101).split("0x")[1]
                         case "X":
@@ -299,7 +365,7 @@ with open(fileName) as fileReader:
                     output[CurrentAddress] = currLineInstruction
                     CurrentAddress += 1
             case "INC":
-                if(MemAddress == 0):
+                if(MemAddress == -1):
                     output[CurrentAddress] = hex(0b10100010).split("0x")[1]
                     CurrentAddress += 1
                     match(RegisterA):
@@ -318,7 +384,7 @@ with open(fileName) as fileReader:
                     output[CurrentAddress] = MemAddress
                     CurrentAddress += 1
             case "DEC":
-                if(MemAddress == 0):
+                if(MemAddress == -1):
                     output[CurrentAddress] = hex(0b10100011).split("0x")[1]
                     CurrentAddress += 1
                     match(RegisterA):
@@ -403,6 +469,13 @@ with open(fileName) as fileReader:
 
                     output[CurrentAddress] = str(int(hex(0b1101).split("0x")[1]) << 4) + str(int(hex(regA).split("0x")[1]) << 2) + str(int(hex(regB).split("0x")[1]))
                     CurrentAddress += 1
+            case "JMP":
+                if MemAddress == -1:
+                    output[CurrentAddress] = hex(0b11001000).split("0x")[1]
+                    CurrentAddress += 2 #We increment 2, because we need to come back and fill in the address later
+print("Resolving labels...")
+for lines in linesToResolve:
+    print(lines)
 
 for lineIndex in range(len(output)):
     output[lineIndex] = output[lineIndex].strip().upper()
@@ -428,6 +501,4 @@ for extension in fileExtensions:
                     file.write("\n")
         if(extension == ".txt"):
             for line in output:
-                file.write(line + "\n")
-        
-           
+                file.write(line + "\n")   

@@ -27,7 +27,7 @@ public class SystemMon extends JFrame implements Runnable {
         frame.setVisible(true);
         scroller.setVisible(true);
         while(true){
-            Main.sim.dumpMem();
+            Simulator.dumpMem();
         }
     }
 }

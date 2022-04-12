@@ -52,3 +52,17 @@ All noteable changes for this project will be documented within this file.
 
 - V1 of the Simulator
 - Added more instructions to the compiler
+  
+## [V1.5]
+
+### Added
+
+- Added to gitignore all test.*
+
+### Changed
+
+- Revamped memory structuring
+
+### Removed
+
+- Removed memory page instructions

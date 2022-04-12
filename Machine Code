@@ -6,17 +6,17 @@ ADD:
 
 SUB:
     (10100101 xx00xx00)             A5 (R1)(R2) -- Subtract R2 from R1
-    (101001xx $$$$$$$$ ########)    A6 (0b01) (R1)  (I1 (8b)) -- Subtract Immediate
+    (101001xx ########)    A (0b01) (R1)  (I1 (8b)) -- Subtract Immediate
     
 
 INC:
     (10100010 xx000000)             A2 (R1) 00  -- Increment R1 
-    (10100100 $$$$$$$$ $$$$$$$$)             A4 (MEM) -- Increment Memory Address
+    (10100100 $$$$$$$$)             A4 (MEM) -- Increment Memory Address
     
 
 DEC:
-    (10100111 xx000000)             A7 (R1) 00 -- Decrement R1
-    (10101111 $$$$$$$$ $$$$$$$$)    A8 (MEM) -- Decrement Memory Address
+    (10110111 xx000000)             B7 (R1) 00 -- Decrement R1
+    (10111111 $$$$$$$$)             B8 (MEM) -- Decrement Memory Address
 
 
 TRANSFER:
@@ -47,29 +47,50 @@ CPI:
     (1110 xx00 ########)            E (0b01) (R1) (I1) -- Compare 1 register and 1 immediate
 
 BNE
-    (00110000 $$$$$$$$)             30 (Mem) -- Branch if last result did not produce a zero
+    (00110000 $$$$$$$$ $$$$$$$$)    30 (Mem) -- Branch if last result did not produce a zero
 
 BEQ
-    (00110001 $$$$$$$$)             31 (Mem) -- Branch if last result did produce a zero
+    (00110001 $$$$$$$$ $$$$$$$$)    31 (Mem) -- Branch if last result did produce a zero
 
 JSR
-    (10001011 $$$$$$$$)             8B (Mem)
+    (10001011 $$$$$$$$ $$$$$$$$)    8B (Mem)
 
 JSE
-    (10001101 $$$$$$$$)             8D (Mem) -- JSR on Equals
+    (10001101 $$$$$$$$ $$$$$$$$)    8D (Mem) -- JSR on Equals
 
 JSN
-    (10001110 $$$$$$$$)             8E (Mem) -- JSR on Not Equals
+    (10001110 $$$$$$$$ $$$$$$$$)    8E (Mem) -- JSR on Not Equals
 
 RET
-    (10001100 $$$$$$$$)             8C (Mem)
+    (10001100)                      8C
 
 JMP 
-    (01110000 $$$$$$$$)             70 (Mem)
+    (01110000 $$$$$$$$ $$$$$$$$)    70 (Mem)
 
+## This has been removed from the spec due to the change in memory layouts! ##
 JCM
-    (0100$$$$ $$$$$$$$)             6 (Mem Page Diff) (Mem)
+    (0100$$$$ $$$$$$$$ $$$$$$$$)             6 (Mem Page Diff) (Mem)
+## END OF REMOVALS ##
 
+MJB
+    Move Program Counter to B Register
+
+MBJ
+    Jump to address in B Register
+
+NOP -- No Operation
+    00
+
+BRK -- Break
+    FF
+
+HLT -- Halt the CPU
+    F9
+
+RST -- Reset
+    F7
+
+##This has been removed from the spec due to inneficiencey##
 Memory Ops:
     Increment Page: (IMP)
     (11110000)                      F0 (Go to xx00 in next page)
