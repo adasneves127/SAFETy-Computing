@@ -1,101 +1,92 @@
-# ---------------------------------------------------------------------------- #
-#                             Assembly Conversions                             #
-# ---------------------------------------------------------------------------- #
-#ADD   
+#Machine Code:
+#ADD:
 #   (10100000 xx00xx00)              A0 (R1)(R2) -- Add 2 registers
-#   (101010xx ########)              A1 (0b10) (R1) (I1 (8b)) -- Add Immediate
+#   (101010xx ########)              A (0b10) (R1) (I1 (8b)) -- Add Immediate
+#    
 #
-#SUB
-#   (10100101 xx00xx00)             A5 (R1)(R2) -- Subtract R2 from R1
-#   (101001xx $$$$$$$$ ########)    A6 (0b01) (R1)  (I1 (8b)) -- Subtract Immediate
+#SUB:
+#    (10100101 xx00xx00)             A5 (R1)(R2) -- Subtract R2 from R1
+#    (101001xx ########)             A (0b01) (R1)  (I1 (8b)) -- Subtract Immediate
+#    
 #
-#INC
-#   (10100010 xx000000)             A2 (R1) 00  -- Increment R1 
-#   (10100100 $$$$$$$$ $$$$$$$$)    A4 (MEM) -- Increment Memory Address
+#INC:
+#    (10100010 xx000000)             A2 (R1) 00  -- Increment R1 
+#    (10110100 $$$$$$$$ $$$$$$$$)    B4 (MEM) -- Increment Memory Address
+#    
 #
-#DEC
-#   (10100111 xx000000)             A7 (R1) 00 -- Decrement R1
-#   (10101111 $$$$$$$$ $$$$$$$$)    A8 (MEM) -- Decrement Memory Address
+#DEC:
+#    (10110111 xx000000)             B7 (R1) 00 -- Decrement R1
+#    (10111111 $$$$$$$$ $$$$$$$$)    B8 (MEM) -- Decrement Memory Address
 #
-#Transfer
-#   (11000000 xx00xx00)             C0 (R1) 00 (R2) 00
 #
-#Push
-#   (11000001 xx000000)             C1 (R1)
+#TRANSFER:
+#    (11000000 xx00xx00)             C0 (R1) 00 (R2) 00
 #
-#Pop
-#   (11000010 xx000000)             C2 (R1)
+#PSH:
+#    (11000001 xx000000)             C1 (R1)
 #
-#LOAD                                 (4, 5, 5, 6)
-#   (110001xx ########)             C (0b01) (R1)   (I1 (8b))
-#                                     (8, 9, A, B)
-#   (110010xx $$$$$$$$)             C (0b10) (R1)   (MEM) 0000
+#POP:
+#    (11000010 xx000000)             C2 (R1)
 #
-#Store:
-#                                     (C, D, E, F)
-#   (110011xx $$$$$$$$ $$$$$$$$)    C (0b11) (R1)   (MEM)
+#LOAD:
+#                                    (4, 5, 5, 6)
+#    (110001xx ########)             C (0b01) (R1)   (I1 (8b))
 #
-#CMP
-#   (1101xxxx)                      D (R1) (R2)  -- Compare 2 registers
+#                                    (8, 9, A, B)
+#    (110010xx $$$$$$$$ $$$$$$$$)    C (0b10) (R1)   (MEM) 0000
 #
-#CPI
-#   (1110 xx00 ########)            E (0b01) (R1) (I1) -- Compare 1 register and 1 immediate
+#ST:
+#                                    (C, D, E, F)
+#    (110011xx $$$$$$$$ $$$$$$$$)    C (0b11) (R1)   (MEM)
+#
+#Comparing and Branching:
+#CMP:
+#    (1101xxxx)                      D (R1) (R2)  -- Compare 2 registers
+#
+#CPI:
+#    (1110 xx00 ########)            E (0b01) (R1) (I1) -- Compare 1 register and 1 immediate
 #
 #BNE
-#   (00110000 $$$$$$$$ $$$$$$$$)    30 (Mem) -- Branch if last result did not produce a zero
+#    (00110000 $$$$$$$$ $$$$$$$$)    30 (Mem) -- Branch if last result did not produce a zero
 #
 #BEQ
-#    (00110001 $$$$$$$$ $$$$$$$$)   31 (Mem) -- Branch if last result did produce a zero
+#    (00110001 $$$$$$$$ $$$$$$$$)    31 (Mem) -- Branch if last result did produce a zero
 #
 #JSR
-#   (10001011 $$$$$$$$ $$$$$$$$)   8B (Mem) -- Jump to Subroutine
+#    (10001011 $$$$$$$$ $$$$$$$$)    8B (Mem)
 #
-#RTS
-#   (10001100 $$$$$$$$ $$$$$$$$)   8C (Mem) -- Return from Subroutine
+#JSE
+#    (10001101 $$$$$$$$ $$$$$$$$)    8D (Mem) -- JSR on Equals
 #
-#JSB (Jump to Subroutine (Branch))
-#   (10001101 $$$$$$$$ $$$$$$$$)   8D (Mem) -- Jump to Subroutine
+#JSN
+#    (10001110 $$$$$$$$ $$$$$$$$)    8E (Mem) -- JSR on Not Equals
 #
-#Increment Mem Page
-#   (11110000)                      F0
+#RET
+#    (10001100)                      8C
 #
-#Decrement Mem Page
-#   (11110001)                      F1
-#   
-#---------------------------------------------------------------------------- #
+#JMP 
+#    (01110000 $$$$$$$$ $$$$$$$$)    70 (Mem)
+#
+#
+#MJB
+#    Move Program Counter to B Register
+#
+#MBJ
+#    Jump to address in B Register
+#
+#NOP -- No Operation
+#    00
+#
+#BRK -- Break
+#    FF
+#
+#HLT -- Halt the CPU
+#    F9
+#
+#RST -- Reset
+#    F7
 
-import sys
-import binascii
-
-inputLines = [""] * 65536
-directiveAddresses = []
-
-labelAddresses = {}
-
-CurrentAddress = 0
-
-outputListing = {}
-output = [""] * 65536
-linesToResolve = []
-
-def processDirective(directive):
-    global output
-    global labelAddresses
-    global CurrentAddress
-    global directiveAddresses
-    directive = directive.strip().split()
-    
-    if(directive[0].upper() == ".ORG"):
-        if (int(directive[1]) < CurrentAddress):
-            print("Error: .ORG address must be greater than current address")
-            print("Current Address: " + str(CurrentAddress))
-            print(".ORG Address: " + str(directive[1]))
-            sys.exit(1)
-        CurrentAddress = int(directive[1])
-    if directive[0].upper() == ".LAB":
-        currentLabel = {CurrentAddress: directive[1]}
-        labelAddresses.update(currentLabel)
-    pass
+import sys, binascii
 
 outFile = "a.dml"
 
@@ -135,370 +126,9 @@ fileName = sys.argv[len(sys.argv) - 1]
 #fileName = "testProgram.dal"
 
 
-with open(fileName) as fileReader:
-    for line in fileReader:
-        inputLines[CurrentAddress] = line
-        #Convert ASM to key components
-        if(line.startswith(";")):
-            continue
-        if line.startswith("."):
-            processDirective(line)
-        currentInstruction = ""
-        isImmediate = False;
-        RegisterA = ""
-        RegisterB = ""
-        MemAddress = -1
-        currentLine = line.split(" ")
-        
-        for index in range(0, len(currentLine)):
-            currentLine[index] = currentLine[index].strip()
-        Instruction = currentLine[0].upper()
-        #Load
-        if "LD" in Instruction:
-            currentInstruction = "LOAD"
-            RegisterA = Instruction[-1]
-            
-            if("#" in currentLine[1]):
-                isImmediate = True
-                currentLine[1] = currentLine[1].replace("#", "")
-        #Store
-        elif "ST" in Instruction:
-            currentInstruction = "STORE"
-            RegisterA = Instruction[-1]
-        #Increment Mem Page
-        elif Instruction == "IMP":
-            currentInstruction = "IMP"
-        #Decrement Mem Page
-        elif Instruction == "DMP":
-            currentInstruction = "DMP"
-        #Add
-        elif Instruction == "ADD":
-            if("#" in currentLine[2]):
-                currentInstruction = "ADD"
-                isImmediate = True
-            else:
-                currentInstruction = "ADD"
-        elif Instruction == "SUB":
-            if("#" in currentLine[2]):
-                currentInstruction = "SUB"
-                isImmediate = True
-            else:
-                currentInstruction = "SUB"
-        elif Instruction == "INC":
-            currentInstruction = "INC"
-            if(len(currentLine[1]) == 2):
-                RegisterA = currentLine[1]
-            else:
-                MemAddress = hex(int(currentLine[1]) << 8).split("0x")[1] + str(currentLine[2].split("0x")[1])
-        elif Instruction == "DEC":
-            currentInstruction = "DEC"
-            if(len(currentLine) == 2):
-                RegisterA = currentLine[1]
-            else:
-                MemAddress = hex(int(currentLine[1]) << 8).split("0x")[1] + hex(int(currentLine[2])).split("0x")[1]
-                
-        elif Instruction == "PSH":
-            currentInstruction = "PSH"
-            RegisterA = currentLine[1]
-        elif Instruction == "POP":
-            currentInstruction = "POP"
-            RegisterA = currentLine[1]
-        elif Instruction == "CMP":
-            currentInstruction = "CMP"
-            if(len(currentLine) == 1):
-                RegisterA = currentLine[1]
-                RegisterB = currentLine[2]
-            else:
-                isImmediate = True;
-        elif Instruction[0] == "T":
-            currentInstruction = "TRANS"
-            RegisterA = Instruction[1]
-            RegisterB = Instruction[2]
-        elif Instruction == "JMP":
-            currentInstruction = "JUMP"
-            if len(currentLine) == 2 and len(currentLine[1]) == 4:
-                MemAddress = currentLine[1]
-            else:
-                try:
-                    MemAddress = labelAddresses[currentLine[1]]
-                except:
-                    linesToResolve.append(CurrentAddress)
-        elif Instruction == "JSB":
-            currentInstruction = "JSB"
-            if len(currentLine) == 2 and len(currentLine[1]) == 4:
-                MemAddress = currentLine[1]
-            else:
-                try:
-                    MemAddress = labelAddresses[currentLine[1]]
-                except:
-                    linesToResolve.append(CurrentAddress)
-        elif Instruction == "JSE":
-            currentInstruction = "JSE"
-            if len(currentLine) == 2 and len(currentLine[1]) == 4:
-                MemAddress = currentLine[1]
-            else:
-                try:
-                    MemAddress = labelAddresses[currentLine[1]]
-                except:
-                    linesToResolve.append(CurrentAddress)
-        elif Instruction == "JSN":
-            currentInstruction = "JSN"
-            if len(currentLine) == 2 and len(currentLine[1]) == 4:
-                MemAddress = currentLine[1]
-            else:
-                try:
-                    MemAddress = labelAddresses[currentLine[1]]
-                except:
-                    linesToResolve.append(CurrentAddress)
-        elif Instruction == "JSR":
-            currentInstruction = "JSR"
-            if len(currentLine) == 2 and len(currentLine[1]) == 4:
-                MemAddress = currentLine[1]
-            else:
-                try:
-                    MemAddress = labelAddresses[currentLine[1]]
-                except:
-                    linesToResolve.append(CurrentAddress)
-        elif Instruction == "RET":
-            currentInstruction = "RET"
-        elif Instruction == "HLT":
-            currentInstruction = "HLT"
-        elif Instruction == "NOP":
-            currentInstruction = "NOP"
-        elif Instruction == "BRK":
-            currentInstruction = "BRK"
-        elif Instruction == "RST":
-            currentInstruction = "RST"
+currentLines = []
 
-                
-        else:
-            assert "Invalid Instruction " + Instruction + " at address " + str(CurrentAddress)
-        
+with open(fileName, "r") as File:
+    for line in File:
+        currentLines.append(line.strip())
 
-        #Convert Key Components to ML
-        match currentInstruction:
-            case "LOAD":
-                #(110001xx ########)      
-                #(110010xx $$$$$$$$)
-                if(isImmediate):
-                    match RegisterA:
-                        case "A":
-                            output[CurrentAddress] = hex(0b11000100).split("0x")[1]     
-                        case "B":
-                            output[CurrentAddress] = hex(0b11000101).split("0x")[1]
-                        case "X":
-                            output[CurrentAddress] = hex(0b11000110).split("0x")[1]
-                        case "Y":
-                            output[CurrentAddress] = hex(0b11000111).split("0x")[1]
-                    CurrentAddress += 1
-                    output[CurrentAddress] = currentLine[1]
-                    CurrentAddress += 1
-                else:
-                    match RegisterA:
-                        case "A":
-                            output[CurrentAddress] = hex(0b11001000).split("0x")[1]
-                        case "B":
-                            output[CurrentAddress] = hex(0b11001001).split("0x")[1]
-                        case "X":
-                            output[CurrentAddress] = hex(0b11001010).split("0x")[1]
-                        case "Y":
-                            output[CurrentAddress] = hex(0b11001011).split("0x")[1]
-                    CurrentAddress += 1
-                    output[CurrentAddress] = currentLine[1]
-                    CurrentAddress += 1
-            case "STORE":
-                 #(110011xx $$$$$$$$) #0b11001100
-                match RegisterA:
-                    case "A":
-                        output[CurrentAddress] = hex(0b11001100).split("0x")[1]
-                    case "B":
-                        output[CurrentAddress] = hex(0b11001101).split("0x")[1]
-                    case "X":
-                        output[CurrentAddress] = hex(0b11001110).split("0x")[1]
-                    case "Y":
-                        output[CurrentAddress] = hex(0b11001111).split("0x")[1]
-                CurrentAddress += 1
-                output[CurrentAddress] = currentLine[1]
-                CurrentAddress += 1
-            case "IMP":
-                output[CurrentAddress] = hex(0b11110000).split("0x")[1]
-                CurrentAddress += 1
-            case "DMP":
-                output[CurrentAddress] = hex(0b11110001).split("0x")[1]
-                CurrentAddress += 1
-            case "ADD":
-                if isImmediate: #0b10101000
-                    match RegisterA:
-                        case "A":
-                            output[CurrentAddress] = hex(0b10101000).split("0x")[1]
-                        case "B":
-                            output[CurrentAddress] = hex(0b10101001).split("0x")[1]
-                        case "X":
-                            output[CurrentAddress] = hex(0b10101010).split("0x")[1]
-                        case "Y":
-                            output[CurrentAddress] = hex(0b10101011).split("0x")[1]
-                    CurrentAddress += 1
-                    output[CurrentAddress] = currentLine[1]
-                    CurrentAddress += 1
-                else:
-                    currLineInstruction = ""
-                    output[CurrentAddress] = hex(0b10100011).split("0x")[1]
-                    CurrentAddress += 1
-                    match RegisterA:
-                        case "A":
-                            currLineInstruction += hex(0b0000).split("0x")[1]
-                        case "B":
-                            currLineInstruction += hex(0b0100).split("0x")[1]
-                        case "X":
-                            currLineInstruction += hex(0b1000).split("0x")[1]
-                        case "Y":
-                            currLineInstruction += hex(0b1100).split("0x")[1]
-                    match RegisterB:
-                        case "A":
-                            currLineInstruction += hex(0b0000).split("0x")[1]
-                        case "B":
-                            currLineInstruction += hex(0b0100).split("0x")[1]
-                        case "X":
-                            currLineInstruction += hex(0b1000).split("0x")[1]
-                        case "Y":
-                            currLineInstruction += hex(0b1100).split("0x")[1]
-                    output[CurrentAddress] = currLineInstruction
-                    CurrentAddress += 1
-            case "INC":
-                if(MemAddress == -1):
-                    output[CurrentAddress] = hex(0b10100010).split("0x")[1]
-                    CurrentAddress += 1
-                    match(RegisterA):
-                        case "A":
-                            output[CurrentAddress] = hex(0b00000000).split("0x")[1]
-                        case "B":
-                            output[CurrentAddress] = hex(0b01000000).split("0x")[1]
-                        case "X":
-                            output[CurrentAddress] = hex(0b10000000).split("0x")[1]
-                        case "Y":  
-                            output[CurrentAddress] = hex(0b11000000).split("0x")[1]
-                    CurrentAddress += 1
-                else:
-                    output[CurrentAddress] = hex(0b10100100).split("0x")[1]
-                    CurrentAddress += 1
-                    output[CurrentAddress] = MemAddress
-                    CurrentAddress += 1
-            case "DEC":
-                if(MemAddress == -1):
-                    output[CurrentAddress] = hex(0b10100011).split("0x")[1]
-                    CurrentAddress += 1
-                    match(RegisterA):
-                        case "A":
-                            output[CurrentAddress] = hex(0b00000000).split("0x")[1]
-                        case "B":
-                            output[CurrentAddress] = hex(0b01000000).split("0x")[1]
-                        case "X":
-                            output[CurrentAddress] = hex(0b10000000).split("0x")[1]
-                        case "Y":
-                            output[CurrentAddress] = hex(0b11000000).split("0x")[1]
-                    CurrentAddress += 1
-                else:
-                    output[CurrentAddress] = hex(0b10101111).split("0x")[1]
-                    CurrentAddress += 1
-                    output[CurrentAddress] = hex(MemAddress).split("0x")[1]
-                    CurrentAddress += 1
-            case "PSH":
-                output[CurrentAddress] = hex(0b11000001).split("0x")[1]
-                CurrentAddress += 1
-                match RegisterA:
-                    case "A":
-                        output[CurrentAddress] = hex(0b00000000).split("0x")[1]
-                    case "B":
-                        output[CurrentAddress] = hex(0b01000000).split("0x")[1]
-                    case "X":
-                        output[CurrentAddress] = hex(0b10000000).split("0x")[1]
-                    case "Y":
-                        output[CurrentAddress] = hex(0b11000000).split("0x")[1]
-                CurrentAddress += 1
-            case "POP":
-                output[CurrentAddress] = hex(0b11000010).split("0x")[1]
-                CurrentAddress += 1
-                match RegisterA:
-                    case "A":
-                        output[CurrentAddress] = hex(0b00000000).split("0x")[1]
-                    case "B":
-                        output[CurrentAddress] = hex(0b01000000).split("0x")[1]
-                    case "X":
-                        output[CurrentAddress] = hex(0b10000000).split("0x")[1]
-                    case "Y":
-                        output[CurrentAddress] = hex(0b11000000).split("0x")[1]
-                CurrentAddress += 1
-            case "CMP":
-                if isImmediate: 
-                    regA = 0
-                    match RegisterA:
-                        case "A":
-                            regA = 0
-                        case "B":
-                            regA = 1
-                        case "X":
-                            regA = 2
-                        case "Y":
-                            regA = 3
-                    output[CurrentAddress] = str(int(hex(0b1110).split("0x")[1]) << 4) + str(hex(regA).split("0x")[1]) + "00"
-                    CurrentAddress += 1
-                    output[CurrentAddress] = currentLine[1]
-                    CurrentAddress += 1
-                    pass
-                else:
-                    regA = 0
-                    regB = 0
-                    match RegisterA:
-                        case "A":
-                            regA = 0
-                        case "B":
-                            regA = 1
-                        case "X":
-                            regA = 2
-                        case "Y":
-                            regA = 3
-                    match RegisterB:
-                        case "A":
-                            regB = 0
-                        case "B":
-                            regB = 1
-                        case "X":
-                            regB = 2
-                        case "Y":
-                            regB = 3
-
-                    output[CurrentAddress] = str(int(hex(0b1101).split("0x")[1]) << 4) + str(int(hex(regA).split("0x")[1]) << 2) + str(int(hex(regB).split("0x")[1]))
-                    CurrentAddress += 1
-            case "JMP":
-                if MemAddress == -1:
-                    output[CurrentAddress] = hex(0b11001000).split("0x")[1]
-                    CurrentAddress += 2 #We increment 2, because we need to come back and fill in the address later
-print("Resolving labels...")
-for lines in linesToResolve:
-    print(lines)
-
-for lineIndex in range(len(output)):
-    output[lineIndex] = output[lineIndex].strip().upper()
-    hexPrefix = hex(lineIndex).split("0x")[1]
-    if(len(hexPrefix) < 4):
-        hexPrefix = "0" * (4 - len(hexPrefix)) + hexPrefix
-    
-    print(hexPrefix+ ": " + output[lineIndex])
-            
-for extension in fileExtensions:
-    if(extension == ".bin"):
-        with open(fileName + extension, "wb") as file:
-            for line in output:
-                file.write(binascii.unhexlify(line))
-        continue
-    with open(fileName + extension, "w") as file:
-        if(extension == ".lst"):
-            file.write("ML\t\tASM\n")
-            file.write("______________________\n")
-            for index in range(len(output)):
-                file.write(output[index] + "\t\t" + inputLines[index])
-                if(output[index] == ""):
-                    file.write("\n")
-        if(extension == ".txt"):
-            for line in output:
-                file.write(line + "\n")   

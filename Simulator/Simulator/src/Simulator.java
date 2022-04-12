@@ -52,7 +52,11 @@ public class Simulator  {
         int currIns = mem.read();
 
         if(currIns >> 4 == 0xA || currIns >> 4 == 0xB){
-            currIns = (currIns << 8) | mem.read();
+            if((currIns & 0xF) == 0x4 && (currIns >> 4 == 0xB)){
+                currIns = (currIns << 16) | mem.read() << 8 | mem.read();
+            }
+            else
+                currIns = (currIns << 8) | mem.read();
         } else if(currIns >> 4 == 0xC){
             if((currIns & 0b100) == 0b100){
                 currIns = (currIns << 8) | mem.read();
