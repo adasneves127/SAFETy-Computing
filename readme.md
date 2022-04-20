@@ -114,3 +114,9 @@ All noteable changes for this project will be documented within this file.
 * Simulator Prototype built in Java
   * System Monitor graphical Display Designed
 * Simulator Language changed to Changelog
+
+##  [V1.6.2]
+
+### Added
+- Added more instructions to the assembler
+- Added Changed changelog to ReadMe.md
