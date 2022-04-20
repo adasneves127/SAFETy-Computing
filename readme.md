@@ -1,3 +1,34 @@
+# Read Me
+
+This repository contains code to interpret and execute a custom assembly code. The specific assembly code is provided in the 'assembly.txt' file. 
+
+To convert assembly code into machine code, use DALAssembler.py.
+
+Memory Addresses are stored in the 'memory.txt' file.
+All memory addresses are stored in hexadecimal. All addresses are 16 bits long.
+Each memory address stores 8 bits of data.
+
+### Assembly
+
+Assembly files have the file extension of .DAL
+
+### Machine Code
+
+Machine code files end with .dal.txt, .dal.lst, and .dal.bin. Addresses in MC are Little Endian.
+
+## Assembler
+To use the assembler, run the script as python3, and supply an input file.
+
+ex: python3 DALAssembler.py \<-o outputFile> inputFile
+
+## Simulator
+
+To run the simulator, first off, compile it with GCC or Clang.
+
+ex: gcc -o simulator simulator.c
+
+After that, run it with ./simulator \<input file\>
+
 # Change Log
 
 All noteable changes for this project will be documented within this file.
@@ -78,3 +109,8 @@ All noteable changes for this project will be documented within this file.
 
 ### Changed
 - Changed instruction codes to prevent potential conflicts.
+
+## Simulator Status
+* Simulator Prototype built in Java
+  * System Monitor graphical Display Designed
+* Simulator Language changed to Changelog

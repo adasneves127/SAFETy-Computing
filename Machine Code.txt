@@ -1,12 +1,18 @@
 Machine Code:
 
-25 Total Instructions useable
+
 
 ADD:
    (10100000 xx00xx00)              A0 (R1)(R2) -- Add 2 registers
    (101010xx ########)              A (0b10) (R1) (I1 (8b)) -- Add Immediate
 (ADD A B)
 (ADD A #5)
+
+LSR:
+    (010101 (R1))          5 (0b01) (R)
+LSL:
+    (010100 (R1))          5 (0b00) (R)
+
 
 SUB:
     (10100101 xx00xx00)             A5 (R1)(R2) -- Subtract R2 from R1
@@ -54,7 +60,7 @@ ST:
 Comparing and Branching:
 CMP:
     (1101xxxx)                      D (R1) (R2)  -- Compare 2 registers
-    (1110xx00 ########)             E (0b10) (R1) (0x00) (I1) -- Compare immediate
+    (1110xx00 ########)             E (R1) (0x00) (I1) -- Compare immediate
 (CMP A B)
 (CMP A #5)
 
@@ -88,10 +94,12 @@ JMP
 
 MJB
     Move Program Counter to B Register
+    (01110100)                      74
 (MJB)
 
 MBJ
     Jump to address in B Register
+    (01110011)                      73
 (MBJ)
 
 NOP -- No Operation

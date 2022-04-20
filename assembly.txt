@@ -1,0 +1,139 @@
+This assembly contains 40 total instructions and 2 directives. They are as follows:
+
+2 Directives:
+.org $$$$$$$$ $$$$$$$$
+
+.lab (Name)
+    All labels must include one non-hex character.
+
+40 Total Instructions available
+
+Key Symbols:
+    # - Constant Number
+    $ - Memory Address
+
+ADD:
+    Add 2 registers and store the result in the A register
+        ADD Reg1, Reg2
+    Add 1 Register and 1 Constant and store the result in the A register
+        ADD Reg1, #constant
+
+SUB:
+    Subtract Reg1 from Reg2 registers and store the result in the A register
+        SUB Reg1, Reg2
+    Subtract 1 Constant from 1 Register and store the result in the A register
+        SUB Reg1, #constant
+
+INC:
+    Increment the value of a register
+        INC Reg1
+    Increment the value in a memory address
+        INC $address
+
+DEC:
+    Decrement the value of a register
+        DEC Reg1
+    Decrement the value in a memory address
+        DEC $address
+
+Transfer:
+    Transfer the value of Reg 1 to Reg 2
+        T Reg1, Reg2
+    ex:
+        TAB
+        TAX
+        TAY
+        TBA
+        TBX
+        TBY
+        etc...
+
+PUSH:
+    Push the value of a register onto the stack
+        PSH Reg1
+
+POP:
+    Pop the value of a register from the stack
+        POP Reg1
+
+LOAD:
+    Load the value of a register from memory
+        LD Reg1, $address
+        ex:
+            LDA, $5C10
+            LDB, $4F9B
+            LDX, $EFF0
+            LDY, $BF10
+    Load the value of a register from a constant:
+        LD Reg1, #constant
+        ex:
+            LDA, #5C10
+            LDB, #4F9B
+            LDX, #EFF0
+            LDY, #BF10
+STORE:
+    Store the value of a register in memory
+        ST Reg1, $address
+        ex:
+            STA, $5C10
+            STB, $4F9B
+            STX, $EFF0
+            STY, $BF10
+
+CMP:
+    Compare the value of a register to another register
+        CMP Reg1, Reg2
+    Compare the value of a register to a constant
+        CMP Reg1, #constant
+
+BNE:
+    Branch on not equal (If last comparison was not equal)
+        BNE $address
+        BNE Label
+
+BEQ:
+    Branch on equal (If last comparison was equal)
+        BEQ $address
+        BEQ Label
+
+JSR:
+    Jump to subroutine
+        JSR $address
+        JSR Label
+
+JSE:
+    Jump to subroutine if equal
+        JSE $address
+        JSE Label
+
+JSN:
+    Jump to subroutine if not equal
+        JSN $address
+        JSN Label
+
+RET:
+    Return from subroutine
+        RET
+
+MJB:
+    Move PC to B Register
+
+MBJ:
+    Move B Register to PC
+
+NOP:
+    No operation
+        NOP
+
+BRK:
+    Break
+        BRK
+
+HLT:
+    Halt
+        HLT
+
+RST:
+    Reset
+        RST
+        

@@ -86,8 +86,15 @@
 #RST -- Reset
 #    F7
 
-from calendar import c
-import sys, binascii
+
+def findBELEcode(addr):
+    BE = addr >> 8
+    LE = addr & 0xFF
+    return (BE, LE)
+
+import sys, binascii, re
+
+requiredChars = ["g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
 
 REGA = 0
 REGB = 1
@@ -113,7 +120,7 @@ for argIndex in range(1, len(sys.argv)):
         argumentsFound += 2
     elif(sys.argv[argIndex] == "-h"):
         print("""
-DAL Assembly Tool
+DAL Assembly Tool V2
         Usage: DALAssembler.py [-o <output file>] <input file>
         -o <output file> - Specify the output file.
         <input file> - Specify the input file.
@@ -160,11 +167,15 @@ def processDirective(directive):
         else:
             assert "Error: Directive .ORG must be between 0 and 0xFFFF"
     elif(directive == ".LBL"):
-        label = directive[1]
+        label = directive[1::]
         if(label in labels):
             assert "Label already exists!"
-        labels[label] = currentAddress
-
+        for char in requiredChars:
+            if char in label:
+                labels[label] = currentAddress
+                break
+            pass
+        
 
 
 for line in currentLines:
@@ -182,7 +193,7 @@ for line in currentLines:
     elif line == "HLT":
         output[currentAddress] = 0xF9
         currentAddress += 1
-    elif line == "ADD":
+    elif sublines[0] == "ADD":
         if("#" in sublines[-1]):
             #This is an immediate add!
             output[currentAddress] = 0xA0
@@ -235,7 +246,7 @@ for line in currentLines:
                     break;
             output[currentAddress] = output[currentAddress] << 2
             currentAddress += 1
-    elif line == "SUB":
+    elif sublines[0] == "SUB":
         if("#" in sublines[-1]):
             #This is an immediate sub!
             output[currentAddress] = 0xAC
@@ -288,7 +299,7 @@ for line in currentLines:
                     break;
             output[currentAddress] = output[currentAddress] << 2
             currentAddress += 1
-    elif line == "INC":
+    elif sublines[0] == "INC":
         if(sublines[-1] == "A" or sublines[-1] == "B" or sublines[-1] == "X" or sublines[-1] == "Y"):
             #This is a register inc!
             output[currentAddress] = 0xA2
@@ -316,7 +327,7 @@ for line in currentLines:
             currentAddress += 1
             output[currentAddress] = output[currentAddress] << 4 #Get the upper nibble
             currentAddress += 1
-    elif line == "DEC":
+    elif sublines[0] == "DEC":
         if(sublines[-1] == "A" or sublines[-1] == "B" or sublines[-1] == "X" or sublines[-1] == "Y"):
            #This is a register dec!
             output[currentAddress] = 0xB7
@@ -344,25 +355,25 @@ for line in currentLines:
             currentAddress += 1
             output[currentAddress] = output[currentAddress] << 4 #Get the upper nibble
             currentAddress += 1
-    elif line[0] == "T":
+    elif sublines[0][0] == "T":
         #This is a transfer!
         output[currentAddress] = 0xC0
         currentAddress += 1
-        match sublines[1]:
+        match line[1]:
             case "A":
-                output[currentAddress] = output[currentAddress] | REGA
+                output[currentAddress] =  REGA
                 break;
             case "B":
-                output[currentAddress] = output[currentAddress] | REGB
+                output[currentAddress] =  REGB
                 break;
             case "X":
-                output[currentAddress] = output[currentAddress] | REGX
+                output[currentAddress] =  REGX
                 break;
             case "Y":
-                output[currentAddress] = output[currentAddress] | REGY
+                output[currentAddress] =  REGY
                 break;
         output[currentAddress] = output[currentAddress] << 4
-        match sublines[2]:
+        match line[2]:
             case "A":
                 output[currentAddress] = output[currentAddress] | REGA
                 break;
@@ -377,11 +388,18 @@ for line in currentLines:
                 break;
         output[currentAddress] = output[currentAddress] << 2
         currentAddress += 1
-    elif line == "JMP":
+    elif sublines[0] == "JMP":
         #This is a jump!
+        output[currentAddress] = 0x70
+        currentAddress += 1
         try:
             #This is an address Jump!
-            int(sublines[1])
+            addr = int(sublines[1], 16)
+            BELECODE = findBELEcode(addr)
+            output[currentAddress] = BELECODE[0]
+            currentAddress += 1
+            output[currentAddress] = BELECODE[1]
+            currentAddress += 1
         except:
             #This is a label Jump!
             if(sublines[1] not in labels):
@@ -391,3 +409,299 @@ for line in currentLines:
                 currentAddress += 1
                 output[currentAddress] = labels[sublines[1]] >> 4
                 currentAddress += 1
+    elif sublines[0][0:1] == "ST":
+        #This is a Store Command!
+        reg = sublines[0][2]
+        addr = sublines[1]
+        output[currentAddress] = 0b110011 << 2
+        match reg:
+            case "A":
+                output[currentAddress] = output[currentAddress] | REGA
+                break;
+            case "B":
+                output[currentAddress] = output[currentAddress] | REGB
+                break;
+            case "X":
+                output[currentAddress] = output[currentAddress] | REGX
+                break
+            case "Y":
+                output[currentAddress] = output[currentAddress] | REGY
+                break;
+        currentAddress += 1
+        #Get memory address:
+        addressEnd = findBELEcode(addr)
+        output[currentAddress] = addressEnd[1]
+        currentAddress += 1
+        output[currentAddress] = addressEnd[0]
+        currentAddress += 1
+    elif sublines[0][0:1] == "LD":
+        #This is a Load Command!
+        reg = sublines[0][2]
+        addr = sublines[1]
+        output[currentAddress] = 0b110101 << 2
+        match reg:
+            case "A":
+                output[currentAddress] = output[currentAddress] | REGA
+                break;
+            case "B":
+                output[currentAddress] = output[currentAddress] | REGB
+                break;
+            case "X":
+                output[currentAddress] = output[currentAddress] | REGX
+                break
+            case "Y":
+                output[currentAddress] = output[currentAddress] | REGY
+                break;
+        currentAddress += 1
+        #Get memory address:
+        addressEnd = findBELEcode(addr)
+        output[currentAddress] = addressEnd[1]
+        currentAddress += 1
+        output[currentAddress] = addressEnd[0]
+        currentAddress += 1
+    elif sublines[0] == "PSH":
+        #PUSH
+        output[currentAddress] = 0b11000001
+        currentAddress+=1
+        match sublines[1]:
+            case "A":
+                output[currentAddress] = output[currentAddress] | REGA
+                break;
+            case "B":
+                output[currentAddress] = output[currentAddress] | REGB
+                break;
+            case "X":
+                output[currentAddress] = output[currentAddress] | REGX
+                break
+            case "Y":
+                output[currentAddress] = output[currentAddress] | REGY
+                break;
+        output[currentAddress] = output[currentAddress] << 6
+        currentAddress += 1
+    elif sublines[0] == "POP":
+        output[currentAddress] = 0b11000010
+        currentAddress += 1
+        match sublines[1]:
+            case "A":
+                output[currentAddress] = output[currentAddress] | REGA
+                break;
+            case "B":
+                output[currentAddress] = output[currentAddress] | REGB
+                break;
+            case "X":
+                output[currentAddress] = output[currentAddress] | REGX
+                break
+            case "Y":
+                output[currentAddress] = output[currentAddress] | REGY
+                break;
+        output[currentAddress] = output[currentAddress] << 6
+    elif sublines[0] == "CMP":
+        if("#" in sublines[-1]):
+            #This is an immediate comparison
+            output[currentAddress] = 0b1110 << 2;
+            match sublines[1]:
+                case "A":
+                    output[currentAddress] = output[currentAddress] | REGA
+                    break;
+                case "B":
+                    output[currentAddress] = output[currentAddress] | REGB
+                    break;
+                case "X":
+                    output[currentAddress] = output[currentAddress] | REGX
+                    break
+                case "Y":
+                    output[currentAddress] = output[currentAddress] | REGY
+                    break;
+            output[currentAddress] = output[currentAddress] << 2;
+        else:
+            output[currentAddress] = 0x1101 << 2
+            #We want our lower register to be the first register
+            regA = sublines[1]
+            regB = sublines[2]
+            if(regA < regB):
+                tmp = regA
+                regA = regB
+                regB = tmp
+
+            
+
+
+            match regA:
+                case "A":
+                    output[currentAddress] = output[currentAddress] | REGA
+                    break;
+                case "B":
+                    output[currentAddress] = output[currentAddress] | REGB
+                    break;
+                case "X":
+                    output[currentAddress] = output[currentAddress] | REGX
+                    break
+                case "Y":
+                    output[currentAddress] = output[currentAddress] | REGY
+                    break;
+            output[currentAddress] = output[currentAddress] << 2
+            match regB:
+                case "A":
+                    output[currentAddress] = output[currentAddress] | REGA
+                    break;
+                case "B":
+                    output[currentAddress] = output[currentAddress] | REGB
+                    break;
+                case "X":
+                    output[currentAddress] = output[currentAddress] | REGX
+                    break
+                case "Y":
+                    output[currentAddress] = output[currentAddress] | REGY
+                    break;
+            currentAddress += 1
+    elif sublines[0] == "BNE":
+        #Branch on Not Equal
+        output[currentAddress] = 0x30
+        currentAddress += 1
+        try:
+            #This is an address Jump!
+            addr = int(sublines[1], 16)
+            BELECODE = findBELEcode(addr)
+            output[currentAddress] = BELECODE[0]
+            currentAddress += 1
+            output[currentAddress] = BELECODE[1]
+            currentAddress += 1
+        except:
+            #This is a label Jump!
+            if(sublines[1] not in labels):
+                linesToResolve.append(currentAddress)
+            else:
+                output[currentAddress] = labels[sublines[1]] & 0x0F
+                currentAddress += 1
+                output[currentAddress] = labels[sublines[1]] >> 4
+                currentAddress += 1
+    elif sublines[0] == "BEQ":
+        #Branch on Equal
+        output[currentAddress] = 0x31
+        currentAddress += 1
+        try:
+            #This is an address Jump!
+            addr = int(sublines[1], 16)
+            BELECODE = findBELEcode(addr)
+            output[currentAddress] = BELECODE[0]
+            currentAddress += 1
+            output[currentAddress] = BELECODE[1]
+            currentAddress += 1
+        except:
+            #This is a label Jump!
+            if(sublines[1] not in labels):
+                linesToResolve.append(currentAddress)
+            else:
+                output[currentAddress] = labels[sublines[1]] & 0x0F
+                currentAddress += 1
+                output[currentAddress] = labels[sublines[1]] >> 4
+                currentAddress += 1
+    elif sublines[0] == "JSR":
+        #Jump to Subroutine
+        output[currentAddress] = 0x8B
+        currentAddress += 1
+        try:
+            #This is an address Jump!
+            addr = int(sublines[1], 16)
+            BELECODE = findBELEcode(addr)
+            output[currentAddress] = BELECODE[0]
+            currentAddress += 1
+            output[currentAddress] = BELECODE[1]
+            currentAddress += 1
+        except:
+            #This is a label Jump!
+            if(sublines[1] not in labels):
+                linesToResolve.append(currentAddress)
+            else:
+                output[currentAddress] = labels[sublines[1]] & 0x0F
+                currentAddress += 1
+                output[currentAddress] = labels[sublines[1]] >> 4
+                currentAddress += 1  
+    elif sublines[0] == "JSE":
+        #Jump to Subroutine if Equal
+        output[currentAddress] = 0x8D
+        currentAddress += 1
+        try:
+            #This is an address Jump!
+            addr = int(sublines[1], 16)
+            BELECODE = findBELEcode(addr)
+            output[currentAddress] = BELECODE[0]
+            currentAddress += 1
+            output[currentAddress] = BELECODE[1]
+            currentAddress += 1
+        except:
+            #This is a label Jump!
+            if(sublines[1] not in labels):
+                linesToResolve.append(currentAddress)
+            else:
+                output[currentAddress] = labels[sublines[1]] & 0x0F
+                currentAddress += 1
+                output[currentAddress] = labels[sublines[1]] >> 4
+                currentAddress += 1
+    elif sublines[0] == "JSN":
+        #Jump to Subroutine if Not Equal
+        output[currentAddress] = 0x8E
+        currentAddress += 1
+        currentAddress += 1
+        try:
+            #This is an address Jump!
+            addr = int(sublines[1], 16)
+            BELECODE = findBELEcode(addr)
+            output[currentAddress] = BELECODE[0]
+            currentAddress += 1
+            output[currentAddress] = BELECODE[1]
+            currentAddress += 1
+        except:
+            #This is a label Jump!
+            if(sublines[1] not in labels):
+                linesToResolve.append(currentAddress)
+            else:
+                output[currentAddress] = labels[sublines[1]] & 0x0F
+                currentAddress += 1
+                output[currentAddress] = labels[sublines[1]] >> 4
+                currentAddress += 1
+    elif sublines[0] == "RET":
+        #Return from Subroutine
+        output[currentAddress] = 0x8C
+        currentAddress += 1
+    elif sublines[0] == "MJB":
+        #Move PC to B
+        output[currentAddress] = 0x74
+        currentAddress += 1
+    elif sublines[0] == "MBJ":
+        #Move B to PC
+        output[currentAddress] = 0x73
+        currentAddress += 1
+    elif sublines[0] == "LSR":
+        output[currentAddress] = 0b010101 << 2
+        match sublines[1]:
+            case "A":
+                output[currentAddress] = output[currentAddress] | REGA
+                break;
+            case "B":
+                output[currentAddress] = output[currentAddress] | REGB
+                break;
+            case "X":
+                output[currentAddress] = output[currentAddress] | REGX
+                break
+            case "Y":
+                output[currentAddress] = output[currentAddress] | REGY
+                break;
+        currentAddress += 1
+    elif sublines[0] == "LSL":
+         output[currentAddress] = 0b10100 << 2
+         match sublines[1]:
+            case "A":
+                output[currentAddress] = output[currentAddress] | REGA
+                break;
+            case "B":
+                output[currentAddress] = output[currentAddress] | REGB
+                break;
+            case "X":
+                output[currentAddress] = output[currentAddress] | REGX
+                break
+            case "Y":
+                output[currentAddress] = output[currentAddress] | REGY
+                break;
+
+    

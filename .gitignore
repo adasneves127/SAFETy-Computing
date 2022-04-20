@@ -4,3 +4,5 @@ lib
 .classpath
 run.sh
 test.*
+simulator
+build.sh
