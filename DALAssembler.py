@@ -10,6 +10,7 @@ def findBELEcode(addr):
     BE = addr >> 8
     LE = addr & 0xFF
     return (BE, LE)
+    
 
 #Imports
 import sys, binascii
@@ -139,6 +140,7 @@ def processDirective(directive):
         
 #For each line in the current lines array
 for line in currentLines:
+    oldIndex = currentAddress
     #Print out the line
     print(line)
     #If the line is blank, skip it
@@ -153,27 +155,20 @@ for line in currentLines:
         processDirective(line)
     #Split the line into smaller parts
     sublines = line.split(" ")
+    listOutput[listIndex] = line
     
     if line ==               "NOP":   #If the line is a "NOP" instruction, then add 0x00 to the output
         output[currentAddress] = 00
         currentAddress+= 1
-        listOutput[listIndex] = "00"
-        listIndex += 1
     elif line ==             "BRK": #If the line is a "BRK" instruction, then add 0xFF to the output
         output[currentAddress] = 0xFF
         currentAddress += 1
-        listOutput[listIndex] = "FF"
-        listIndex += 1
     elif line ==             "RST": #If the line is a "RST" instruction, then add 0xF7 to the output
         output[currentAddress] = 0xF7
         currentAddress += 1
-        listOutput[listIndex] = "F7"
-        listIndex += 1
     elif line ==             "HLT": #If the line is a "HLT" instruction, then add 0xF9 to the output
         output[currentAddress] = 0xF9
         currentAddress += 1
-        listOutput[listIndex] = "F9"
-        listIndex += 1
     elif sublines[0] ==      "ADD": #If we are adding, then determine if it is an immediate, or a register
         #If the line is an immediate
         if("#" in sublines[-1]):
@@ -187,25 +182,21 @@ for line in currentLines:
                 output[currentAddress] = output[currentAddress] | REGX
             elif sublines[1] == "Y":
                 output[currentAddress] = output[currentAddress] | REGY
-            listOutput[listIndex] = str(output[currentAddress])
-            currentAddress += 1
+                currentAddress += 1
             output[currentAddress] = int(sublines[-1][1:], 16)  #Add the immediate to the output
-            listOutput[listIndex] =  listOutput[listIndex] + " " + str(output[currentAddress])
-            listIndex += 1
             currentAddress += 1
         else:
             #This is a register add!
             output[currentAddress] = 0xA0   #Add 0b10100000 to the output, then determine the register, and "or" it to the output.
-            listOutput[listIndex] =  listOutput[listIndex] + " " + str(output[currentAddress])
             currentAddress += 1
             if sublines[1] == "A":
-                output[currentAddress] = output[currentAddress] | REGA
+                output[currentAddress] = REGA
             elif sublines[1] == "B":
-                output[currentAddress] = output[currentAddress] | REGB
+                output[currentAddress] = REGB
             elif sublines[1] == "X":
-                output[currentAddress] = output[currentAddress] | REGX
+                output[currentAddress] = REGX
             elif sublines[1] == "Y":
-                output[currentAddress] = output[currentAddress] | REGY
+                output[currentAddress] = REGY
             output[currentAddress] = output[currentAddress] << 4 #Shift the register to the left by 4, and find the next register.
             if sublines[2] == "A":
                 output[currentAddress] = output[currentAddress] | REGA
@@ -216,9 +207,7 @@ for line in currentLines:
             elif sublines[2] == "Y":
                 output[currentAddress] = output[currentAddress] | REGY
             output[currentAddress] = output[currentAddress] << 2    #Shift the register to the left by 2.
-            listOutput[listIndex] =  listOutput[listIndex] + " " + str(output[currentAddress])
             currentAddress += 1
-            listIndex += 1
     elif sublines[0] ==      "SUB": #Same as above, but for SUB
         if("#" in sublines[-1]):
             #This is an immediate sub!
@@ -231,25 +220,21 @@ for line in currentLines:
                 output[currentAddress] = output[currentAddress] | REGX
             elif sublines[1] == "Y":
                 output[currentAddress] = output[currentAddress] | REGY
-            listOutput[listIndex] =  listOutput[listIndex] + " " + str(output[currentAddress])
             currentAddress += 1
             output[currentAddress] = int(sublines[-1][1:], 16)
-            listOutput[listIndex] =  listOutput[listIndex] + " " + str(output[currentAddress])
-            listIndex += 1
             currentAddress += 1
         else:
             #This is a register sub!
             output[currentAddress] = 0xA5
-            listOutput[listIndex] =  listOutput[listIndex] + " " + str(output[currentAddress])
             currentAddress += 1
             if sublines[1] == "A":
-                output[currentAddress] = output[currentAddress] | REGA
+                output[currentAddress] = REGA
             elif sublines[1] == "B":
-                output[currentAddress] = output[currentAddress] | REGB
+                output[currentAddress] = REGB
             elif sublines[1] == "X":
-                output[currentAddress] = output[currentAddress] | REGX
+                output[currentAddress] = REGX
             elif sublines[1] == "Y":
-                output[currentAddress] = output[currentAddress] | REGY
+                output[currentAddress] = REGY
             output[currentAddress] = output[currentAddress] << 4
             if sublines[2] == "A":
                 output[currentAddress] = output[currentAddress] | REGA
@@ -260,75 +245,64 @@ for line in currentLines:
             elif sublines[2] == "Y":
                 output[currentAddress] = output[currentAddress] | REGY
             output[currentAddress] = output[currentAddress] << 2
-            listOutput[listIndex] =  listOutput[listIndex] + " " + str(output[currentAddress])
             currentAddress += 1
-            listIndex += 1
     elif sublines[0] ==      "INC": #Same as above, but for INC
         if(sublines[-1] == "A" or sublines[-1] == "B" or sublines[-1] == "X" or sublines[-1] == "Y"):
             #This is a register inc!
             output[currentAddress] = 0xA2
-            listOutput[listIndex] =  listOutput[listIndex] + " " + str(output[currentAddress])
             currentAddress += 1
             if sublines[-1] == "A":
-                output[currentAddress] = output[currentAddress] | REGA
+                output[currentAddress] = REGA
             elif sublines[-1] == "B":
-                output[currentAddress] = output[currentAddress] | REGB
+                output[currentAddress] = REGB
             elif sublines[-1] == "X":
-                output[currentAddress] = output[currentAddress] | REGX
+                output[currentAddress] = REGX
             elif sublines[-1] == "Y":
-                output[currentAddress] = output[currentAddress] | REGY
+                output[currentAddress] = REGY
             output[currentAddress] = output[currentAddress] << 6
-            listOutput[listIndex] =  listOutput[listIndex] + " " + str(output[currentAddress])
-            listIndex += 1
             currentAddress += 1
         else:
             #This is an memory inc!
             output[currentAddress] = 0xB4
-            listOutput[listIndex] =  listOutput[listIndex] + " " + str(output[currentAddress])
             currentAddress += 1
-            output[currentAddress] = sublines[1] & 0x0F #Get the lower nibble
-            listOutput[listIndex] =  listOutput[listIndex] + " " + str(output[currentAddress])
+            output[currentAddress] = int(sublines[1][1::]) & 0x0F #Get the lower nibble
             currentAddress += 1
-            output[currentAddress] = output[currentAddress] << 4 #Get the upper nibble
-            listOutput[listIndex] =  listOutput[listIndex] + " " + str(output[currentAddress])
+            try:
+                output[currentAddress] = int(output[currentAddress][1::]) >> 4 #Get the upper nibble
+            except:
+                output[currentAddress] = 0
             currentAddress += 1
-            listIndex += 1
     elif sublines[0] ==      "DEC": #Same as above, but for DEC
         if(sublines[-1] == "A" or sublines[-1] == "B" or sublines[-1] == "X" or sublines[-1] == "Y"):
            #This is a register dec!
             output[currentAddress] = 0xB7
-            listOutput[listIndex] =  listOutput[listIndex] + " " + str(output[currentAddress])
             currentAddress += 1
             if sublines[-1] == "A":
-                    output[currentAddress] = output[currentAddress] | REGA
+                    output[currentAddress] =  REGA
             elif sublines[-1] ==  "B":
-                    output[currentAddress] = output[currentAddress] | REGB
+                    output[currentAddress] = REGB
             elif sublines[-1] == "X":
-                    output[currentAddress] = output[currentAddress] | REGX
+                    output[currentAddress] = REGX
             elif sublines[-1] == "Y":
-                    output[currentAddress] = output[currentAddress] | REGY
+                    output[currentAddress] = REGY
                     break;
             output[currentAddress] = output[currentAddress] << 6
-            listOutput[listIndex] =  listOutput[listIndex] + " " + str(output[currentAddress])
-            listIndex += 1
             currentAddress += 1
         else:
             #This is an memory dec!
             output[currentAddress] = 0xB8
-            listOutput[listIndex] =  listOutput[listIndex] + " " + str(output[currentAddress])
             currentAddress += 1
-            output[currentAddress] = sublines[1] & 0x0F #Get the lower nibble
-            listOutput[listIndex] =  listOutput[listIndex] + " " + str(output[currentAddress])
+            output[currentAddress] = int(sublines[1][1::]) & 0x0F #Get the lower nibble
             currentAddress += 1
-            output[currentAddress] = output[currentAddress] << 4 #Get the upper nibble
-            listOutput[listIndex] =  listOutput[listIndex] + " " + str(output[currentAddress])
-            listIndex += 1
+            try:
+                output[currentAddress] = int(output[currentAddress][1::]) << 4 #Get the upper nibble
+            except:
+                output[currentAddress] = "00"
             currentAddress += 1
     elif sublines[0][0] ==   "T": #Transfer command. We add 0xC0 to the output, then find the registers, and add them as xx00xx00 in the next memory location.
         print("Transfer!")
         #This is a transfer!
         output[currentAddress] = 0xC0
-        listOutput[listIndex] =  listOutput[listIndex] + " " + str(output[currentAddress])
         currentAddress += 1
         if sublines[0][1] == "A":
             output[currentAddress] =  REGA
@@ -348,24 +322,18 @@ for line in currentLines:
         elif sublines[0][2] == "Y":
             output[currentAddress] =  output[currentAddress] |REGY
         output[currentAddress] = output[currentAddress] << 2
-        listOutput[listIndex] =  listOutput[listIndex] + " " + str(output[currentAddress])
-        listIndex += 1
         currentAddress += 1
     elif sublines[0] ==      "JMP": #Calculate the jump address, and add it to the output.
         #This is a jump!
         output[currentAddress] = 0x70
-        listOutput[listIndex] =  listOutput[listIndex] + " " + str(output[currentAddress])
         currentAddress += 1
         try:
             #This is an address Jump!
             addr = int(sublines[1], 16)
             BELECODE = findBELEcode(addr)
             output[currentAddress] = BELECODE[0]
-            listOutput[listIndex] =  listOutput[listIndex] + " " + str(output[currentAddress])
             currentAddress += 1
             output[currentAddress] = BELECODE[1]
-            listOutput[listIndex] =  listOutput[listIndex] + str(output[currentAddress])
-            listIndex += 1
             currentAddress += 1
         except:
             #This is a label Jump!
@@ -375,13 +343,10 @@ for line in currentLines:
                 currentAddress += 2
             else:
                 output[currentAddress] = labels[sublines[1]] & 0x0F
-                listOutput[listIndex] =  listOutput[listIndex] + " " + str(output[currentAddress])
                 currentAddress += 1
                 output[currentAddress] = labels[sublines[1]] >> 4
-                listOutput[listIndex] =  listOutput[listIndex] + str(output[currentAddress])
                 currentAddress += 1
-                listIndex += 1
-    elif sublines[0][0:1] == "ST": #Store command. We add 0b110011 to the output, then find the register, and "or" with the opcode. Then find the mem location. and store that.
+    elif sublines[0][0] == "S" and sublines[0][1] == "T": #Store command. We add 0b110011 to the output, then find the register, and "or" with the opcode. Then find the mem location. and store that.
         #This is a Store Command!
         reg = sublines[0][2]
         addr = sublines[1]
@@ -394,18 +359,14 @@ for line in currentLines:
             output[currentAddress] = output[currentAddress] | REGX
         elif reg == "Y":
             output[currentAddress] = output[currentAddress] | REGY
-        listOutput[listIndex] =  listOutput[listIndex] + " " + str(output[currentAddress])
         currentAddress += 1
-        listIndex += 1
-        #Get memory address:
+                #Get memory address:
         addressEnd = findBELEcode(addr)
         output[currentAddress] = addressEnd[1]
-        listOutput[listIndex] =  listOutput[listIndex] + addressEnd[1] + addressEnd[0]
-        listIndex += 1
         currentAddress += 1
         output[currentAddress] = addressEnd[0]
         currentAddress += 1
-    elif sublines[0][0:1] == "LD":   #Load command. We add 0b110010 to the output, then find the register, and "or" with the opcode. Then find the mem location, or immediate, and store that.
+    elif sublines[0][0] == "L" and sublines[0][1] == "D":   #Load command. We add 0b110010 to the output, then find the register, and "or" with the opcode. Then find the mem location, or immediate, and store that.
         if(not "#" in sublines[1]):
             print("Ld NON-IMM")
             #This is a Load Command (Non-imm)!
@@ -455,33 +416,33 @@ for line in currentLines:
             #Get number:
             if(sublines[1][0] == "#"):
                 num = sublines[1][1:]
-                num = int("0x" + str(num), 16)
                 output[currentAddress] = num
+                currentAddress += 1
     elif sublines[0] ==      "PSH":  #Push command. We add 0b11000001 to the output, then find the register, and add it to the next output space.
         #PUSH
         output[currentAddress] = 0b11000001
         currentAddress+=1
         if sublines[1] == "A":
-            output[currentAddress] = output[currentAddress] | REGA
+            output[currentAddress] = REGA
         elif sublines[1] == "B":
-            output[currentAddress] = output[currentAddress] | REGB
+            output[currentAddress] = REGB
         elif sublines[1] == "X":
-            output[currentAddress] = output[currentAddress] | REGX
+            output[currentAddress] = REGX
         elif sublines[1] == "Y":
-            output[currentAddress] = output[currentAddress] | REGY
+            output[currentAddress] =  REGY
         output[currentAddress] = output[currentAddress] << 6
         currentAddress += 1
     elif sublines[0] ==      "POP":  #Pop Command. We add 0b11000010 to the output, then find the register, and add it to the next output space.
         output[currentAddress] = 0b11000010
         currentAddress += 1
         if sublines[1] == "A":
-            output[currentAddress] = output[currentAddress] | REGA
+            output[currentAddress] = REGA
         elif sublines[1] == "B":
-            output[currentAddress] = output[currentAddress] | REGB
+            output[currentAddress] = REGB
         elif sublines[1] == "X":
-            output[currentAddress] = output[currentAddress] | REGX
+            output[currentAddress] = REGX
         elif sublines[1] == "Y":
-            output[currentAddress] = output[currentAddress] | REGY
+            output[currentAddress] = REGY
         output[currentAddress] = output[currentAddress] << 6
     elif sublines[0] ==      "CMP":  #Compare. Add 0b1110, then find the 2 registers, and add them into the output.
         if("#" in sublines[-1]):
@@ -667,6 +628,7 @@ for line in currentLines:
                 output[currentAddress] = output[currentAddress] | REGX
         elif sublines[1] == "Y":
                 output[currentAddress] = output[currentAddress] | REGY
+    listIndex += (currentAddress - oldIndex)
 
 #If we have any unresolved labels, we need to resolve them now.
 print(linesToResolve)
@@ -701,19 +663,22 @@ for extension in fileExtensions:
             file.write("______________________\n")
 
             #for each line in the output
-            for index in range(len(currentLines)):
+            for index in range(len(listOutput)):
                 #If the line is blank, continue.
                 if(output[index] == ''):
                     file.write("00\n")
                     continue
                 #Otherwise, write to the file the hex value of the line, and the disassembled line.
-                file.write(hex(int(output[index]))[2::].upper() + "\t\t" + str(currentLines[index]) + "\n")
+                outputHex = str(output[index]).upper()
+                while len(outputHex) < 2:
+                    outputHex = "0" + outputHex
+                file.write(outputHex + "\t\t" + str(listOutput[index]) + "\n")
                 if(output[index] == ""):
                     file.write("\n")
         if(extension == ".txt"):
             for line in output:
                 if(line == ""):
                     continue
-                file.write(hex(int(line))[2::] + "\n")
+                file.write(str(line) + "\n")
 
     
