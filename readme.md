@@ -120,3 +120,13 @@ All noteable changes for this project will be documented within this file.
 ### Added
 - Added more instructions to the assembler
 - Added Changed changelog to ReadMe.md
+
+## [V2.0]
+
+### Added
+
+- Added instructions to the assembler
+
+### Changed
+
+- Simulator changed from C to C++

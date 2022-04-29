@@ -158,16 +158,16 @@ for line in currentLines:
     listOutput[listIndex] = line
     
     if line ==               "NOP":   #If the line is a "NOP" instruction, then add 0x00 to the output
-        output[currentAddress] = 00
+        output[currentAddress] = "00"
         currentAddress+= 1
     elif line ==             "BRK": #If the line is a "BRK" instruction, then add 0xFF to the output
-        output[currentAddress] = 0xFF
+        output[currentAddress] = "FF"
         currentAddress += 1
     elif line ==             "RST": #If the line is a "RST" instruction, then add 0xF7 to the output
-        output[currentAddress] = 0xF7
+        output[currentAddress] = "F7"
         currentAddress += 1
     elif line ==             "HLT": #If the line is a "HLT" instruction, then add 0xF9 to the output
-        output[currentAddress] = 0xF9
+        output[currentAddress] = "F9"
         currentAddress += 1
     elif sublines[0] ==      "ADD": #If we are adding, then determine if it is an immediate, or a register
         #If the line is an immediate
@@ -182,12 +182,14 @@ for line in currentLines:
                 output[currentAddress] = output[currentAddress] | REGX
             elif sublines[1] == "Y":
                 output[currentAddress] = output[currentAddress] | REGY
-                currentAddress += 1
-            output[currentAddress] = int(sublines[-1][1:], 16)  #Add the immediate to the output
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
+            currentAddress += 1
+            output[currentAddress] = hex(sublines[-1][1:], 16)[2::] #Add the immediate to the output
             currentAddress += 1
         else:
             #This is a register add!
             output[currentAddress] = 0xA0   #Add 0b10100000 to the output, then determine the register, and "or" it to the output.
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
             if sublines[1] == "A":
                 output[currentAddress] = REGA
@@ -207,6 +209,7 @@ for line in currentLines:
             elif sublines[2] == "Y":
                 output[currentAddress] = output[currentAddress] | REGY
             output[currentAddress] = output[currentAddress] << 2    #Shift the register to the left by 2.
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
     elif sublines[0] ==      "SUB": #Same as above, but for SUB
         if("#" in sublines[-1]):
@@ -220,12 +223,15 @@ for line in currentLines:
                 output[currentAddress] = output[currentAddress] | REGX
             elif sublines[1] == "Y":
                 output[currentAddress] = output[currentAddress] | REGY
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
             output[currentAddress] = int(sublines[-1][1:], 16)
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
         else:
             #This is a register sub!
             output[currentAddress] = 0xA5
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
             if sublines[1] == "A":
                 output[currentAddress] = REGA
@@ -245,11 +251,13 @@ for line in currentLines:
             elif sublines[2] == "Y":
                 output[currentAddress] = output[currentAddress] | REGY
             output[currentAddress] = output[currentAddress] << 2
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
     elif sublines[0] ==      "INC": #Same as above, but for INC
         if(sublines[-1] == "A" or sublines[-1] == "B" or sublines[-1] == "X" or sublines[-1] == "Y"):
             #This is a register inc!
             output[currentAddress] = 0xA2
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
             if sublines[-1] == "A":
                 output[currentAddress] = REGA
@@ -260,22 +268,28 @@ for line in currentLines:
             elif sublines[-1] == "Y":
                 output[currentAddress] = REGY
             output[currentAddress] = output[currentAddress] << 6
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
         else:
             #This is an memory inc!
             output[currentAddress] = 0xB4
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
             output[currentAddress] = int(sublines[1][1::]) & 0x0F #Get the lower nibble
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
             try:
                 output[currentAddress] = int(output[currentAddress][1::]) >> 4 #Get the upper nibble
+                output[currentAddress] = hex(int(output[currentAddress]))[2:]
             except:
                 output[currentAddress] = 0
+                output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
     elif sublines[0] ==      "DEC": #Same as above, but for DEC
         if(sublines[-1] == "A" or sublines[-1] == "B" or sublines[-1] == "X" or sublines[-1] == "Y"):
            #This is a register dec!
             output[currentAddress] = 0xB7
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
             if sublines[-1] == "A":
                     output[currentAddress] =  REGA
@@ -287,22 +301,27 @@ for line in currentLines:
                     output[currentAddress] = REGY
                     break;
             output[currentAddress] = output[currentAddress] << 6
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
         else:
             #This is an memory dec!
             output[currentAddress] = 0xB8
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
             output[currentAddress] = int(sublines[1][1::]) & 0x0F #Get the lower nibble
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
             try:
                 output[currentAddress] = int(output[currentAddress][1::]) << 4 #Get the upper nibble
             except:
                 output[currentAddress] = "00"
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
     elif sublines[0][0] ==   "T": #Transfer command. We add 0xC0 to the output, then find the registers, and add them as xx00xx00 in the next memory location.
         print("Transfer!")
         #This is a transfer!
         output[currentAddress] = 0xC0
+        output[currentAddress] = hex(int(output[currentAddress]))[2:]
         currentAddress += 1
         if sublines[0][1] == "A":
             output[currentAddress] =  REGA
@@ -322,18 +341,22 @@ for line in currentLines:
         elif sublines[0][2] == "Y":
             output[currentAddress] =  output[currentAddress] |REGY
         output[currentAddress] = output[currentAddress] << 2
+        output[currentAddress] = hex(int(output[currentAddress]))[2:]
         currentAddress += 1
     elif sublines[0] ==      "JMP": #Calculate the jump address, and add it to the output.
         #This is a jump!
         output[currentAddress] = 0x70
+        output[currentAddress] = hex(int(output[currentAddress]))[2:]
         currentAddress += 1
         try:
             #This is an address Jump!
             addr = int(sublines[1], 16)
             BELECODE = findBELEcode(addr)
             output[currentAddress] = BELECODE[0]
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
             output[currentAddress] = BELECODE[1]
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
         except:
             #This is a label Jump!
@@ -343,7 +366,9 @@ for line in currentLines:
                 currentAddress += 2
             else:
                 output[currentAddress] = labels[sublines[1]] & 0x0F
+                output[currentAddress] = hex(int(output[currentAddress]))[2:]
                 currentAddress += 1
+                output[currentAddress] = hex(int(output[currentAddress]))[2:]
                 output[currentAddress] = labels[sublines[1]] >> 4
                 currentAddress += 1
     elif sublines[0][0] == "S" and sublines[0][1] == "T": #Store command. We add 0b110011 to the output, then find the register, and "or" with the opcode. Then find the mem location. and store that.
@@ -359,12 +384,15 @@ for line in currentLines:
             output[currentAddress] = output[currentAddress] | REGX
         elif reg == "Y":
             output[currentAddress] = output[currentAddress] | REGY
+        output[currentAddress] = hex(int(output[currentAddress]))[2:]
         currentAddress += 1
                 #Get memory address:
         addressEnd = findBELEcode(addr)
         output[currentAddress] = addressEnd[1]
+        output[currentAddress] = hex(int(output[currentAddress]))[2:]
         currentAddress += 1
         output[currentAddress] = addressEnd[0]
+        output[currentAddress] = hex(int(output[currentAddress]))[2:]
         currentAddress += 1
     elif sublines[0][0] == "L" and sublines[0][1] == "D":   #Load command. We add 0b110010 to the output, then find the register, and "or" with the opcode. Then find the mem location, or immediate, and store that.
         if(not "#" in sublines[1]):
@@ -381,13 +409,16 @@ for line in currentLines:
                 output[currentAddress] = output[currentAddress] | REGX
             elif reg == "Y":
                 output[currentAddress] = output[currentAddress] | REGY
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
             #Get memory address:
             try:
                 addressEnd = findBELEcode(addr)
                 output[currentAddress] = addressEnd[1]
+                output[currentAddress] = hex(int(output[currentAddress]))[2:]
                 currentAddress += 1
                 output[currentAddress] = addressEnd[0]
+                output[currentAddress] = hex(int(output[currentAddress]))[2:]
                 currentAddress += 1
             except:
                 if(addr not in labels):
@@ -396,8 +427,10 @@ for line in currentLines:
                 else:
                     addressEnd = findBELEcode(labels[addr])
                     output[currentAddress] = addressEnd[1]
+                    output[currentAddress] = hex(int(output[currentAddress]))[2:]
                     currentAddress += 1
                     output[currentAddress] = addressEnd[0]
+                    output[currentAddress] = hex(int(output[currentAddress]))[2:]
                     currentAddress += 1
         else:
             print("Ld IMM")
@@ -412,11 +445,13 @@ for line in currentLines:
                 output[currentAddress] = output[currentAddress] | REGX
             elif reg == "Y":
                 output[currentAddress] = output[currentAddress] | REGY
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
             #Get number:
             if(sublines[1][0] == "#"):
                 num = sublines[1][1:]
                 output[currentAddress] = num
+                output[currentAddress] = hex(int(output[currentAddress]))[2:]
                 currentAddress += 1
     elif sublines[0] ==      "PSH":  #Push command. We add 0b11000001 to the output, then find the register, and add it to the next output space.
         #PUSH
@@ -431,6 +466,7 @@ for line in currentLines:
         elif sublines[1] == "Y":
             output[currentAddress] =  REGY
         output[currentAddress] = output[currentAddress] << 6
+        output[currentAddress] = hex(int(output[currentAddress]))[2:]
         currentAddress += 1
     elif sublines[0] ==      "POP":  #Pop Command. We add 0b11000010 to the output, then find the register, and add it to the next output space.
         output[currentAddress] = 0b11000010
@@ -444,6 +480,8 @@ for line in currentLines:
         elif sublines[1] == "Y":
             output[currentAddress] = REGY
         output[currentAddress] = output[currentAddress] << 6
+        output[currentAddress] = hex(int(output[currentAddress]))[2:]
+        currentAddress += 1
     elif sublines[0] ==      "CMP":  #Compare. Add 0b1110, then find the 2 registers, and add them into the output.
         if("#" in sublines[-1]):
             #This is an immediate comparison
@@ -457,6 +495,8 @@ for line in currentLines:
             elif sublines[1] == "Y":
                 output[currentAddress] = output[currentAddress] | REGY
             output[currentAddress] = output[currentAddress] << 2;
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
+            currentAddress += 1
         else:
             output[currentAddress] = 0x1101 << 2
             #We want our lower register to be the first register
@@ -483,18 +523,22 @@ for line in currentLines:
                 output[currentAddress] = output[currentAddress] | REGX
             elif regB == "Y":
                 output[currentAddress] = output[currentAddress] | REGY
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
     elif sublines[0] ==      "BNE":  #Branch if not equal. Add 0x30, then find the label or address, and add it to the output.
         #Branch on Not Equal
         output[currentAddress] = 0x30
+        output[currentAddress] = hex(int(output[currentAddress]))[2:]
         currentAddress += 1
         try:
             #This is an address Jump!
             addr = int(sublines[1], 16)
             BELECODE = findBELEcode(addr)
             output[currentAddress] = BELECODE[0]
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
             output[currentAddress] = BELECODE[1]
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
         except:
             #This is a label Jump!
@@ -503,20 +547,25 @@ for line in currentLines:
                 currentAddress += 2
             else:
                 output[currentAddress] = labels[sublines[1]] & 0x0F
+                output[currentAddress] = hex(int(output[currentAddress]))[2:]
                 currentAddress += 1
                 output[currentAddress] = labels[sublines[1]] >> 4
+                output[currentAddress] = hex(int(output[currentAddress]))[2:]
                 currentAddress += 1
     elif sublines[0] ==      "BEQ":  #Branch if equal. Add 0x31, then find the label or address, and add it to the output.
         #Branch on Equal
         output[currentAddress] = 0x31
+        output[currentAddress] = hex(int(output[currentAddress]))[2:]
         currentAddress += 1
         try:
             #This is an address Jump!
             addr = int(sublines[1], 16)
             BELECODE = findBELEcode(addr)
             output[currentAddress] = BELECODE[0]
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
             output[currentAddress] = BELECODE[1]
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
         except:
             #This is a label Jump!
@@ -525,20 +574,25 @@ for line in currentLines:
                 currentAddress += 2
             else:
                 output[currentAddress] = labels[sublines[1]] & 0x0F
+                output[currentAddress] = hex(int(output[currentAddress]))[2:]
                 currentAddress += 1
                 output[currentAddress] = labels[sublines[1]] >> 4
+                output[currentAddress] = hex(int(output[currentAddress]))[2:]
                 currentAddress += 1
     elif sublines[0] ==      "JSR":  #Jump to subroutine. Add 0x8B, then find the label or address, and add it to the output.
         #Jump to Subroutine
         output[currentAddress] = 0x8B
+        output[currentAddress] = hex(int(output[currentAddress]))[2:]
         currentAddress += 1
         try:
             #This is an address Jump!
             addr = int(sublines[1], 16)
             BELECODE = findBELEcode(addr)
             output[currentAddress] = BELECODE[0]
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
             output[currentAddress] = BELECODE[1]
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
         except:
             #This is a label Jump!
@@ -547,20 +601,25 @@ for line in currentLines:
                 currentAddress += 2
             else:
                 output[currentAddress] = labels[sublines[1]] & 0x0F
+                output[currentAddress] = hex(int(output[currentAddress]))[2:]
                 currentAddress += 1
                 output[currentAddress] = labels[sublines[1]] >> 4
+                output[currentAddress] = hex(int(output[currentAddress]))[2:]
                 currentAddress += 1  
     elif sublines[0] ==      "JSE":  #Jump to subroutine if equal. Add 0x8C, then find the label or address, and add it to the output.
         #Jump to Subroutine if Equal
         output[currentAddress] = 0x8D
+        output[currentAddress] = hex(int(output[currentAddress]))[2:]
         currentAddress += 1
         try:
             #This is an address Jump!
             addr = int(sublines[1], 16)
             BELECODE = findBELEcode(addr)
             output[currentAddress] = BELECODE[0]
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
             output[currentAddress] = BELECODE[1]
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
         except:
             #This is a label Jump!
@@ -569,21 +628,25 @@ for line in currentLines:
                 currentAddress += 2
             else:
                 output[currentAddress] = labels[sublines[1]] & 0x0F
+                output[currentAddress] = hex(int(output[currentAddress]))[2:]
                 currentAddress += 1
                 output[currentAddress] = labels[sublines[1]] >> 4
+                output[currentAddress] = hex(int(output[currentAddress]))[2:]
                 currentAddress += 1
     elif sublines[0] ==      "JSN":  #Jump to subroutine if not equal. Add 0x8E, then find the label or address, and add it to the output.
         #Jump to Subroutine if Not Equal
         output[currentAddress] = 0x8E
-        currentAddress += 1
+        output[currentAddress] = hex(int(output[currentAddress]))[2:]
         currentAddress += 1
         try:
             #This is an address Jump!
             addr = int(sublines[1], 16)
             BELECODE = findBELEcode(addr)
             output[currentAddress] = BELECODE[0]
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
             output[currentAddress] = BELECODE[1]
+            output[currentAddress] = hex(int(output[currentAddress]))[2:]
             currentAddress += 1
         except:
             #This is a label Jump!
@@ -592,42 +655,49 @@ for line in currentLines:
                 currentAddress += 2
             else:
                 output[currentAddress] = labels[sublines[1]] & 0x0F
+                output[currentAddress] = hex(int(output[currentAddress]))[2:]
                 currentAddress += 1
                 output[currentAddress] = labels[sublines[1]] >> 4
+                output[currentAddress] = hex(int(output[currentAddress]))[2:]
                 currentAddress += 1
     elif sublines[0] ==      "RET":  #Return from subroutine. Add 0x8C.
         #Return from Subroutine
         output[currentAddress] = 0x8C
+        output[currentAddress] = hex(int(output[currentAddress]))[2:]
         currentAddress += 1
     elif sublines[0] ==      "MJB":  #Move Jump -> B. Move PC to B, 
         #Move PC to B
         output[currentAddress] = 0x74
+        output[currentAddress] = hex(int(output[currentAddress]))[2:]
         currentAddress += 1
     elif sublines[0] ==      "MBJ":  #Move B -> Jump. Move B to PC,
         #Move B to PC
         output[currentAddress] = 0x73
+        output[currentAddress] = hex(int(output[currentAddress]))[2:]
         currentAddress += 1
     elif sublines[0] ==      "LSR":  #Logical Shift Right. Add 0b01010100, then find the register, and add it to the output.
         output[currentAddress] = 0b010101 << 2
         if sublines[1] == "A":
             output[currentAddress] = output[currentAddress] | REGA
         elif sublines[1] == "B":
-                output[currentAddress] = output[currentAddress] | REGB
+            output[currentAddress] = output[currentAddress] | REGB
         elif sublines[1] == "X":
-                output[currentAddress] = output[currentAddress] | REGX
+            output[currentAddress] = output[currentAddress] | REGX
         elif sublines[1] == "Y":
-                output[currentAddress] = output[currentAddress] | REGY
+            output[currentAddress] = output[currentAddress] | REGY
+        output[currentAddress] = hex(int(output[currentAddress]))[2:]
         currentAddress += 1
     elif sublines[0] ==      "LSL":  #Logical Shift Left. Add 0b010100, then find the register, and add it to the output.
         output[currentAddress] = 0b010100 << 2
         if sublines[1] == "A":
             output[currentAddress] = output[currentAddress] | REGA
         elif sublines[1] == "B":
-                output[currentAddress] = output[currentAddress] | REGB
+            output[currentAddress] = output[currentAddress] | REGB
         elif sublines[1] == "X":
-                output[currentAddress] = output[currentAddress] | REGX
+            output[currentAddress] = output[currentAddress] | REGX
         elif sublines[1] == "Y":
-                output[currentAddress] = output[currentAddress] | REGY
+            output[currentAddress] = output[currentAddress] | REGY
+        output[currentAddress] = hex(int(output[currentAddress]))[2:]
     listIndex += (currentAddress - oldIndex)
 
 #If we have any unresolved labels, we need to resolve them now.
@@ -645,40 +715,45 @@ for extension in fileExtensions:
     #If we are writing to a "bin" file:
     if(extension == ".bin"):
         #Open the file
-        with open(fileName + extension, "wb") as file:
+        with open(outFile + extension, "wb") as file:
             #for each line in the output
             for line in output:
                 #Try to write the line to the file
                 try:
-                    print(str(hex(int(str(line).strip()))[2::]))
-                    file.write(binascii.unhexlify(str(hex(int(str(line)))[2::]).strip()))
+                    lineTemp = str(hex(int(str(line), 16)))[2:]
+                    print(lineTemp)
+                    file.write(binascii.unhexlify(lineTemp))
                 #If we get an error, just continue.
                 except ValueError:
-                    file.write(binascii.unhexlify("00").strip())
-    with open(fileName + extension, "w") as file:
-        #If we are writing to a "lst" file:
-        if(extension == ".lst"):
-            #Write the heading for the file.
-            file.write("ML\t\tASM\n")
-            file.write("______________________\n")
+                    if(lineTemp == ""):
+                        file.write(binascii.unhexlify("00"))
+                    else:
+                        file.write(binascii.unhexlify("0" + str(lineTemp)))
+    else:
+        with open(outFile + extension, "w") as file:
+            #If we are writing to a "lst" file:
+            if(extension == ".lst"):
+                #Write the heading for the file.
+                file.write("ML\t\tASM\n")
+                file.write("______________________\n")
 
-            #for each line in the output
-            for index in range(len(listOutput)):
-                #If the line is blank, continue.
-                if(output[index] == ''):
-                    file.write("00\n")
-                    continue
-                #Otherwise, write to the file the hex value of the line, and the disassembled line.
-                outputHex = str(output[index]).upper()
-                while len(outputHex) < 2:
-                    outputHex = "0" + outputHex
-                file.write(outputHex + "\t\t" + str(listOutput[index]) + "\n")
-                if(output[index] == ""):
-                    file.write("\n")
-        if(extension == ".txt"):
-            for line in output:
-                if(line == ""):
-                    continue
-                file.write(str(line) + "\n")
+                #for each line in the output
+                for index in range(len(listOutput)):
+                    #If the line is blank, continue.
+                    if(output[index] == ''):
+                        file.write("00\n")
+                        continue
+                    #Otherwise, write to the file the hex value of the line, and the disassembled line.
+                    outputHex = str(output[index]).upper()
+                    while len(outputHex) < 2:
+                        outputHex = "0" + outputHex
+                    file.write(outputHex + "\t\t" + str(listOutput[index]) + "\n")
+                    if(output[index] == ""):
+                        file.write("\n")
+            if(extension == ".txt"):
+                for line in output:
+                    if(line == ""):
+                        continue
+                    file.write(str(line) + "\n")
 
     

@@ -1,9 +1,16 @@
 $0000 - $00ff:
     Monitor Code?
 $0100 - $01ff:
-$0200 - $02ff:
-$0300 - $03ff:
-$0400 - $04ff:
+    Stack
+$0200 - $0400:
+Video RAM
+
+$0401 - $0500:
+    IO Ports
+        $0401 - $0405:
+            Data Direction. Each bit will be one port.
+        $0406 - 040a:
+            Data Out
 $0500 - $05ff:
 $0600 - $06ff:
 $0700 - $07ff:
@@ -63,23 +70,8 @@ $3c00 - $3cff:
 $3d00 - $3dff:
 $3e00 - $3eff:
 $3f00 - $3fff:
-$4000 - $40ff:
-$4100 - $41ff:
-$4200 - $42ff:
-$4300 - $43ff:
-$4400 - $44ff:
-$4500 - $45ff:
-$4600 - $46ff:
-$4700 - $47ff:
-$4800 - $48ff:
-$4900 - $49ff:
-$4a00 - $4aff:
-$4b00 - $4bff:
-$4c00 - $4cff:
-$4d00 - $4dff:
-$4e00 - $4eff:
-$4f00 - $4fff:
-$5000 - $50ff:
+$4000 - $50ff:
+    Open memory for programming
 $5100 - $51ff:
 $5200 - $52ff:
 $5300 - $53ff:
@@ -247,13 +239,10 @@ $f400 - $f4ff:
 $f500 - $f5ff:
 $f600 - $f6ff:
 $f700 - $ffaf:
-    Video RAM
-
 $fb00 - $fbff:
-    IO Ports
 $fc00 - $fcff:
 $fd00 - $fdff:
 $fe00 - $feff:
 $ff00 - $ffff:
-    $ff0f:
+    $ffef:
         Reset Vector

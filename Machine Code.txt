@@ -92,16 +92,6 @@ JMP
     (01110000 $$$$$$$$ $$$$$$$$)    70 (Mem)
 (JMP $4000)
 
-MJB
-    Move Program Counter to B Register
-    (01110100)                      74
-(MJB)
-
-MBJ
-    Jump to address in B Register
-    (01110011)                      73
-(MBJ)
-
 NOP -- No Operation
     00
 
