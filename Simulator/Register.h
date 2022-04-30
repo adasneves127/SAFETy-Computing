@@ -7,11 +7,11 @@ class Register{
         
         void set(unsigned char value);
         void set(unsigned short value);
-        unsigned char get();
+        unsigned short get();
         void setType(bool type);
         bool getType();
     private:
         unsigned char value8;
-        unsigned char value16;
+        unsigned short value16;
         bool dataLen;
 };

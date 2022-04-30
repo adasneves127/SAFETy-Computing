@@ -8,8 +8,7 @@ class Mem{
     public:
         unsigned char mem[0xFFFF];
         Mem();
-        unsigned char read();
         unsigned char read(unsigned short address);
-        void write(unsigned char value);
+       
         void write(unsigned char value, unsigned short address);
 };

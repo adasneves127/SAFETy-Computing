@@ -1,1 +1,0 @@
-clang++ -o Simulator Main.cpp Memory.cpp ALU.cpp Register.cpp Registers.cpp

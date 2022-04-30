@@ -753,7 +753,9 @@ for extension in fileExtensions:
             if(extension == ".txt"):
                 for line in output:
                     if(line == ""):
-                        continue
-                    file.write(str(line) + "\n")
-
+                        file.write("00\n")
+                    else:
+                        while len(line) < 2:
+                            line = "0" + line
+                        file.write(str(line) + "\n")
     

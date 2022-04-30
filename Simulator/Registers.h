@@ -1,13 +1,11 @@
-#ifndef REGISTERS_H // include guard
-    #define REGISTERS_H
-#endif
+#pragma once
 
 #include "Register.h"
 
 class Registers{
     public:
         Register A, B, X, Y, SP, INS, PC;
-        //Flags: CNZVI
+        //Flags: CNZVI000
         unsigned char flags;
         void reset();
 };

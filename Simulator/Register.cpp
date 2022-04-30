@@ -4,7 +4,7 @@ Register::Register(){
 
 }
 
-unsigned char Register::get(){
+unsigned short Register::get(){
     if(dataLen)
         return value8;
     else

@@ -9,5 +9,5 @@ unsigned char Mem::read(unsigned short address){
 }
 
 void Mem::write(unsigned char value, unsigned short address){
-    
+    mem[address] = value;
 }

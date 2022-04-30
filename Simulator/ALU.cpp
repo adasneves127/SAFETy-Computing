@@ -68,7 +68,22 @@ unsigned char ALU::INC(Register r1){
     return flags;
 }
 
-unsigned char ALU::INC(unsigned short address, unsigned char* mem[]){
-    *mem[address] = *mem[address] + 1;
+unsigned char ALU::INC(unsigned short address, unsigned char mem[]){
+    mem[address] = mem[address] + 1;
+    return flags;
+}
+
+unsigned char ALU::DEC(Register r1){
+    if(r1.getType()){
+        r1.set((unsigned char)(r1.get() - 1));
+    } else{
+        r1.set((unsigned short)(r1.get() - 1));
+    }
+
+    return flags;
+}
+
+unsigned char ALU::DEC(unsigned short address, unsigned char mem[]){
+    mem[address] = mem[address] - 1;
     return flags;
 }

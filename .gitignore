@@ -6,3 +6,5 @@ run.sh
 test.*
 build.sh
 .vscode
+Simulator/.build.sh
+machineCodeExample.txt

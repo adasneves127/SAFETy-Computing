@@ -6,8 +6,6 @@
 #include "Register.h"
 #include "ALU.h"
 #include "Memory.h"
-#include <iostream>
-#include <fstream>
 
 #ifdef __cplusplus__
 
@@ -48,9 +46,21 @@ unsigned char pop();
 void graphicsDraw();
 
 int main(int argc, char* argv[]){
-    std::cout << "Hello World!" << std::endl;
+    //Initialize Registers to be the correct size.
+    reg.A.setType(true);
+    reg.B.setType(true);
+    reg.X.setType(true);
+    reg.Y.setType(true);
+    reg.SP.setType(true);
+    reg.INS.setType(true);
+    reg.PC.setType(false);
 
-    readFile(argv);
+    if(argc > 1){
+        readFile(argv);
+    }
+    else{
+        return 0;
+    }
 
     while(!halted){
         doInstruction();
@@ -72,10 +82,8 @@ void readFile(char *argv[]){
 	
 	while(!feof(f) && i<=0xFFFF)
 	{
-		
 		int c;
 		fscanf(f,"%x\n",&c);
-		
 		
 		unsigned char readIn = (unsigned char)(c & 0xff);
 		mem.mem[i] = readIn;
@@ -107,6 +115,7 @@ void doInstruction(){
     if(ins == 0xA0){ //Add 2 Registers
         unsigned char nextIns = mem.read(reg.PC.get());
         reg.PC.set((unsigned short)(reg.PC.get() + 1));
+        //TODO: Finish Command
 
     } else if((ins & 0b11111100) == 0b10101000){ //Registers Addition
         // ADD
@@ -123,19 +132,39 @@ void doInstruction(){
         regs[ins & 0b11].set((unsigned short)(regs[ins & 0b11].get() >> 1));
     } else if ((ins & 0b11111100) == 0b01010000){ // LSL
         regs[ins & 0b11].set((unsigned char)(regs[ins & 0b11].get() << 1));
-    } else if (ins == 0x8C){
-        unsigned char LN = pop();
-        unsigned char UN = pop();
-        unsigned short addr = (UN << 8) | LN;
-        reg.PC.set(addr);
-    } else if (ins == 0x70){
-        unsigned char LN = readMemIncPC();
-        unsigned char UN = readMemIncPC();
-        unsigned short addr = (UN << 8) | LN;
-        reg.PC.set(addr);
-    } else if(ins == 0xA2){
-        unsigned char data = readMemIncPC() >> 6;
-        alu.INC(regs[data]);
+    } else if (ins == 0x8C){ // RET
+        unsigned char UN = pop(); // Get the high byte
+        unsigned char LN = pop(); // Get the low byte
+        unsigned short addr = (UN << 8) | LN; // Combine the bytes
+        reg.PC.set(addr); // Set the PC
+    } else if (ins == 0x70){ // JMP
+        unsigned char LN = readMemIncPC(); // Get the low byte
+        unsigned char UN = readMemIncPC(); // Get the high byte
+        unsigned short addr = (UN << 8) | LN; // Combine the bytes
+        reg.PC.set(addr); // Set the PC
+    } else if(ins == 0xA2){ // Increment Register
+        unsigned char data = readMemIncPC() >> 6; // Get the register
+        reg.flags |= alu.INC(regs[data]); // Increment the register
+    } else if(ins == 0xB4){ // Increment Mem Addr
+        unsigned char LN = readMemIncPC(); // Get the low byte
+        unsigned char UN = readMemIncPC(); // Get the high byte
+        unsigned short addr = (UN << 8) | LN; // Combine the bytes
+        reg.flags |= alu.INC(addr, mem.mem);
+    } else if(ins == 0xB7){ //Register Decrement
+        unsigned char data = readMemIncPC() >> 6; // Get the register
+        reg.flags |= alu.INC(regs[data]); // Increment the register
+    } else if(ins == 0x25){ //CLC
+        reg.flags = reg.flags & 0b01111111;
+    } else if(ins == 0x26){ //CLN
+        reg.flags = reg.flags & 0b10111111;
+    } else if(ins == 0x27){ //CLZ
+        reg.flags = reg.flags & 0b11011111;
+    } else if(ins == 0x28){ //CLV
+        reg.flags = reg.flags & 0b11101111;
+    } else if(ins == 0x29){ //CLI
+        reg.flags &= 0b11110111;
+    } else if(ins == 0x3A){ //SIF
+        reg.flags |= 0b00001000;
     }
 
     halted = true;
@@ -147,13 +176,14 @@ void reset(){
 }
 
 void push(unsigned char Data){
-    mem.mem[reg.SP.get() + 100] = Data;
+    mem.mem[reg.SP.get() + 0x100] = Data;
     reg.SP.set((unsigned char)(reg.SP.get() + 1));
 }
 
 unsigned char pop(){
-    unsigned char Data = mem.mem[reg.SP.get() + 100];
     reg.SP.set((unsigned short)(reg.SP.get() - 1));
+    unsigned char Data = mem.mem[reg.SP.get() + 100];
+    mem.mem[reg.SP.get() + 0x100] = 0x00;
     return Data;
 }
 
