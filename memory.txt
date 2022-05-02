@@ -2,17 +2,18 @@ $0000 - $00ff:
     Monitor Code?
 $0100 - $01ff:
     Stack
-$0200 - $0400:
-Video RAM
+$0200 - $05FF:
+    $0200 - 05e8:
+        Screen memory
+    $05e9:
+        Screen line index
 
-$0401 - $0500:
+$0600 - $06ff:
     IO Ports
         $0401 - $0405:
             Data Direction. Each bit will be one port.
         $0406 - 040a:
             Data Out
-$0500 - $05ff:
-$0600 - $06ff:
 $0700 - $07ff:
 $0800 - $08ff:
 $0900 - $09ff:
@@ -120,6 +121,7 @@ $7d00 - $7dff:
 $7e00 - $7eff:
 $7f00 - $7fff:
 
+
 ROM:
 $8000 - $a0ff:
     BASIC?
@@ -217,4 +219,4 @@ $fd00 - $fdff:
 $fe00 - $feff:
 $ff00 - $ffff:
     $ffef:
-        Reset Vector
+        Reset Vector?

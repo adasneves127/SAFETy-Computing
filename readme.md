@@ -130,3 +130,17 @@ All noteable changes for this project will be documented within this file.
 ### Changed
 
 - Simulator changed from C to C++
+
+## [V2.0.1]
+
+### Added
+
+- Added all instructions to the simulator
+
+### Changed
+
+- Changed Memory Map values.
+
+### Removed
+
+- Removed MJB and MBJ instructions.
