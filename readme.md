@@ -143,4 +143,10 @@ All noteable changes for this project will be documented within this file.
 
 ### Removed
 
-- Removed MJB and MBJ instructions.
+- Removed MJB and MBJ instructions, as they were inneficient due to the change in memory layout.
+
+## [V2.1]
+
+### Changed
+
+- Rewrote assembler to be more efficient and intuitive.

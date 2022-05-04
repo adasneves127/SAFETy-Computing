@@ -1,7 +1,6 @@
 Machine Code:
 
 
-
 ADD:
    (10100000 xx00xx00)              A0 (R1)(R2) -- Add 2 registers
    (101010xx ########)              A (0b10) (R1) (I1 (8b)) -- Add Immediate

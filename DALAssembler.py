@@ -719,16 +719,9 @@ for extension in fileExtensions:
             #for each line in the output
             for line in output:
                 #Try to write the line to the file
-                try:
-                    lineTemp = str(hex(int(str(line), 16)))[2:]
-                    print(lineTemp)
-                    file.write(binascii.unhexlify(lineTemp))
-                #If we get an error, just continue.
-                except ValueError:
-                    if(lineTemp == ""):
-                        file.write(binascii.unhexlify("00"))
-                    else:
-                        file.write(binascii.unhexlify("0" + str(lineTemp)))
+                if(line == ""):
+                    continue
+                file.write(bytes(chr(int(line, 16)), encoding="utf-8"))
     else:
         with open(outFile + extension, "w") as file:
             #If we are writing to a "lst" file:
