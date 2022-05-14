@@ -23,11 +23,11 @@ ex: python3 DALAssembler.py \<-o outputFile> inputFile
 
 ## Simulator
 
-To run the simulator, first off, compile it with GCC or Clang.
+To run the simulator, first off, compile it the included shell file.
 
-ex: gcc -o simulator simulator.c
+sh build.sh
 
-After that, run it with ./simulator \<input file\>
+After that, run it with ./Sim \<input file\>
 
 # Change Log
 
