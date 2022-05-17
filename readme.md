@@ -16,6 +16,9 @@ Assembly files have the file extension of .DAL
 
 Machine code files end with .dal.txt, .dal.lst, and .dal.bin. Addresses in MC are Little Endian.
 
+### Schematics
+Links to the schematics can be found [here](https://oshwlab.com/adasneves127/alexcomputer)
+
 ## Assembler
 To use the assembler, run the script as python3, and supply an input file.
 
