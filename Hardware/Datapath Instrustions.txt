@@ -1,0 +1,44 @@
+Datapath controller will connect to control unit
+
+Datapath instructions will come in from CU. Controller will then process what needs to happen.
+
+Datapath Instructions:
+
+let our 8 bit binary number be represented as such:
+
+abcdefgh
+
+If a, b, and c == 0, then the instruction will be a instruction for the registers.
+
+Otherwise, it will be an instruction for the ALU
+
+Register Instructions:
+
+
+000000xx -> Put register xx onto the data line.
+
+0000xx00 -> Put data bus data into register xx.
+
+0001xxyy -> Put data from register yy into xx.
+
+
+ALU Instructions:
+
+abcdxxyy, where xx is the register to store in, and yy is the register to add from.
+
+
+ABC:
+001 -> LSL
+010 -> LSR
+011 -> CMP
+
+ABCD:
+
+1000 -> Add
+1001 -> Sub
+1010 -> Inc
+1011 -> Dec
+1100 -> Add-imm
+1101 -> Sub-imm
+1110 -> Inc-imm
+1111 -> Dec-imm

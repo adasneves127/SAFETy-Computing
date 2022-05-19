@@ -1,8 +1,6 @@
 #include "Registers.h"
 #include "Register.h"
 
-
-
 void Registers::reset(){
      A.set((unsigned char)0);
      B.set((unsigned char)0);

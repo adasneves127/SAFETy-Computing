@@ -10,6 +10,7 @@
 #include <cstdio>
 #include <iostream>
 #include <string>
+#include <string.h>
 #include "Registers.h"
 #include "Register.h"
 #include "ALU.h"
@@ -102,7 +103,6 @@ void readFile(char *argv[]){
 		mem.mem[i] = readIn;
 		//printf("%x\n",mem.mem[i]);
         i++;
-	
 	}
 
 	fclose(f);
@@ -370,5 +370,3 @@ void drawToScreen(char line[]){
     //Draw the screen
     graphicsDraw();
 }
-
-

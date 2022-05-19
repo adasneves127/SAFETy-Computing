@@ -98,7 +98,7 @@ BRK -- Break
     FF
 
 HLT -- Halt the CPU
-    F9
+    F7
 
 RST -- Reset
-    F7
+    F9

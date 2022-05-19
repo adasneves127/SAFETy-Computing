@@ -1,3 +1,3 @@
 #!/bin/bash
 
-clang++ -o Sim ./Simulator/Main.cpp ./Simulator/Memory.cpp ./Simulator/ALU.cpp ./Simulator/Register.cpp ./Simulator/Registers.cpp
+clang++ -o Sim ./Software/Simulator/Main.cpp ./Software/Simulator/Memory.cpp ./Software/Simulator/ALU.cpp ./Software/Simulator/Register.cpp ./Software/Simulator/Registers.cpp
