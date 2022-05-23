@@ -62,11 +62,11 @@ ex: python3 DALAssembler.py \<-o outputFile> inputFile
 
 ## Simulator
 
-To run the simulator, first off, compile it the included shell file.
+To run the simulator, navigate to ./Software/Simulator, and run ```make```
 
-sh build.sh
+After that, run it with ```./Sim <input file>```
 
-After that, run it with ./Sim \<input file\>
+```make clean``` will remove all .o files, as well as the output from `make`.
 
 # Change Log
 
@@ -192,8 +192,12 @@ All noteable changes for this project will be documented within this file.
 - Rewrote assembler to be more efficient and intuitive.
 
 
-### 5/19/22
+## 5/19/22
 
 - Reorganized Repo
   - Added Hardware and Software folders, and sorted into those 2 categories.
 - Added our instructions for the Datapath Controller
+
+## 5/22/22
+
+- Transitioned `build.sh` to `make`

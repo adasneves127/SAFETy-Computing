@@ -1,4 +1,4 @@
-CC = clang++
+CC = g++
 
 CFLAGS = -I.
 
@@ -17,3 +17,8 @@ Registers.o: Registers.cpp Registers.h
 
 Memory.o: Memory.cpp Memory.h
 	$(CC) $(CFLAGS) -c Memory.cpp
+
+.PHONY: clean
+clean:
+	rm -f ./*.o
+	rm -f Simulator
