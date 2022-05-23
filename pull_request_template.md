@@ -6,10 +6,11 @@ Fixes Issue #
 
 ## Type of change
 
-Please check what this referes to:
+Please check what this refers to:
 
 - [ ] Hardware (EasyEDA, or other circuit-related issues)
 - [ ] Software (Assembler, Simulator, or any other code-related issue)
+- [ ] Documentation [Remove All text After this point. "Fixes Issue" should be N/A. Description will contain brief description of files changed.] 
 
 Please delete options that are not relevant.
 
