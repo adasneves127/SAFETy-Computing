@@ -2,8 +2,6 @@ name: Feature Request
 description: Request a feature to be added to this project
 title: "[Feature Request] "
 labels: ["Feature Request"]
-assignees:
- - adasneves127
  
  body:
   - type: markdown
