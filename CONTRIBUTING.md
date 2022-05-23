@@ -20,8 +20,14 @@ We use github to host code, to track issues and feature requests, as well as acc
 5. Make sure your code lints.
 6. Issue that pull request!
 
-## Any contributions you make will be under the MIT Software License
-In short, when you submit code changes, your submissions are understood to be under the same [MIT License](http://choosealicense.com/licenses/mit/) that covers the project. Feel free to contact the maintainers if that's a concern.
+## Process for approving pull requests:
+1. Review code changes, and ensure that changes match description
+2. Test code with multiple scenarios
+3. Check compatibility. (Will a file from an old version work with the new code?)
+4. Approve request. Use comment format of "Approved MM/DD/YYYY -- Name" to ensure correct protocol.
+
+## Any contributions you make will be under the GPL Software License
+In short, when you submit code changes, your submissions are understood to be under the same [GPL 3.0 License]([http://choosealicense.com/licenses/mit/](https://choosealicense.com/licenses/gpl-3.0/)) that covers the project. Feel free to contact the maintainers for any questions or concerns.
 
 ## Report bugs using Github Issues
 We use GitHub issues to track public bugs. Report a bug by [opening a new issue](); it's that easy!
