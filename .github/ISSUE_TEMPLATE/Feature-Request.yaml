@@ -1,14 +1,12 @@
-name: Bug Report
-description: File a bug report
-title: "[Bug]: "
-labels: ["bug", "triage"]
-assignees:
-  - octocat
+name: Feature Request
+description: Request a new feature
+title: "Feature Request: "
+labels: ["Feature Request"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report!
+        Thanks for taking the time to fill out this Feature Request!
   - type: input
     id: contact
     attributes:
@@ -17,41 +15,25 @@ body:
       placeholder: ex. email@example.com
     validations:
       required: false
-  - type: textarea
-    id: what-happened
-    attributes:
-      label: What happened?
-      description: Also tell us, what did you expect to happen?
-      placeholder: Tell us what you see!
-      value: "A bug happened!"
-    validations:
-      required: true
   - type: dropdown
     id: version
     attributes:
       label: Version
-      description: What version of our software are you running?
+      description: Is this a Hardware, or a Software request?
       options:
-        - 1.0.2 (Default)
-        - 1.0.3 (Edge)
+        - Hardware
+        - Software
+      validations:
+      required: true
+  - type: textarea
+    id: Describe the request
+    attributes:
+      label: Description
+      description: Also, do you have any design ideas or extra goals for this request?
+      placeholder: Tell us about it!
+      value: "Create an IDE"
     validations:
       required: true
-  - type: dropdown
-    id: browsers
-    attributes:
-      label: What browsers are you seeing the problem on?
-      multiple: true
-      options:
-        - Firefox
-        - Chrome
-        - Safari
-        - Microsoft Edge
-  - type: textarea
-    id: logs
-    attributes:
-      label: Relevant log output
-      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
-      render: shell
   - type: checkboxes
     id: terms
     attributes:
