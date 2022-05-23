@@ -8,6 +8,13 @@ Memory Addresses are stored in the 'memory.txt' file.
 All memory addresses are stored in hexadecimal. All addresses are 16 bits long.
 Each memory address stores 8 bits of data.
 
+# Please read!
+Please read and understand the terms and rules set in the Contributions file, as well as the Code of Conduct.
+- These files contain information regarding policy, procedure, and proper communication.
+- *Do not Edit the "Master" Branch directly! All code changes must be in the form of a pull request!*
+  - The "Contributing" file contains more information on this process.
+
+
 ## Assembly
 
 Assembly files have the file extension of .DAL
