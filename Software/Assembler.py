@@ -1,11 +1,10 @@
-import sys
-if sys.version_info[0] > 3:
-    raise Exception("Must be using Python 3")
+## Boilerplate Code. Taken from DALAssembler.py
 
+#Set this to true if we are debugging our code. It will override all command line arguments.
 debug = True
 
-
-def findAddr(addr: str):
+#Convert an address into a big endian and little endian string
+def findBELEcode(addr):
     if(addr[0] == '$'):
         addr = addr[1::]
     addr = "0x" + str(addr)
@@ -14,15 +13,33 @@ def findAddr(addr: str):
     LE = addr & 0xFF
     return (BE, LE)
 
+def getReg(reg: str):
+    if(reg == 'a'):
+        return 0
+    elif(reg == 'b'):
+        return 1
+    elif(reg == 'x'):
+        return 2
+    elif(reg == 'y'):
+        return 3
+    else:
+        print("Invalid Register")
+        return -1   
+
+#Imports
+import sys, binascii
+
+#Every label must have one of these characters
 requiredChars = ["g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
 
-
+#Store our register names and their values
 REGA = 0
-REGB = 0
-REGX = 0
-REGY = 0
+REGB = 1
+REGX = 2
+REGY = 3
 
-outFile = "a.dml";
+#Default output file name
+outFile = "a.dml"
 
 #Keep track of how many arguments we have found
 argumentsFound = 0
@@ -74,115 +91,87 @@ else:
     #If we are debugging, just set the output to be test.dal
     fileName = "test.dal"
 
-#These lists will hold the following information:
-#    currentLines - The current file, loaded into an array of lines
-#    labels - A list of labels
-#    linesToResolve - A list of lines that need their labels to be resolved
-currentLines = []
+#Current Lines from the file
+inputLines = []
+
+#All label locations and names
 labels = []
+
+#All jump instruction locations
 linesToResolve = []
 
-with open(fileName, "r") as File:
-    for line in File:
-        if(len(line.split(";")) > 1):
-            currentLines.append(line.strip().upper().split(";")[0])
+output = [0] * 65536
 
-#This will hold the output
-currentAddress = 0
-output = [None] * 65535
+outputIndex = 0;
 
-#List Output
-listOutput = [None] * 65535
-listIndex = 0
+#Open the file
+with open() as fileIn:
+    for line in fileIn:
+        inputLines.append(line.lower())
 
-def processDirective(directive: str):
-    global currentAddress
-    global output
-    global listOutput
-    global listIndex
+## Pass I: Resolve everything except for jump instructions.
 
-def convertReg(reg: str):
-    if(reg == "A"):
-        return REGA
-    elif(reg == "B"):
-        return REGB
-    elif(reg == "X"):
-        return REGX
-    elif(reg == "Y"):
-        return REGY
-
-for line in currentLines:
-    oldIndex = currentAddress
-    if(line[0] == "."):
-        processDirective(line);
-    elif ";" in line:
-        if len(line.split(";")[0]) == 0:
-            continue
-        line = line.split(";")[0]
-    print(line)
-
-    if(len(line) == 0):
-        continue
-
-    if(":" in line):
-        curLab = [currentAddress, line.split(":")[0]]
-        labels.append(curLab)
-        continue
-    
-    if("#" in line):
-        #This is an immediate instruction
-        sublines = line.split(" ")
-        ins = sublines[0]
-        args = sublines[1:]
-        if(ins == "ADD"):
-            #Add
-            insCode = 0xA8
-            insCode |= convertReg(args[0])
-            ImmVal = hex(args[1])[2::]
-            output[currentAddress] = insCode
-            output[currentAddress + 1] = ImmVal
-            currentAddress += 2
-            listOutput[listIndex] = line;
-            listIndex += 2
-        elif(ins == "SUB"):
-            #Subtract
-            insCode = 0xAC
-            insCode |= convertReg(args[0])
-            ImmVal = hex(args[1])[2::]
-            output[currentAddress] = insCode
-            output[currentAddress + 1] = ImmVal
-            currentAddress += 2
-            listOutput[listIndex] = line;
-            listIndex += 2
-        elif("LD" in ins):
-            #Load
-            insCode = 0xC4
-            insCode |= convertReg(args[0])
-            ImmVal = hex(args[1])[2::]
-            output[currentAddress] = insCode
-            output[currentAddress + 1] = ImmVal
-            currentAddress += 2
-            listOutput[listIndex] = line;
-            listIndex += 2
-        elif(ins == "CMP"):
-            #Compare
-            insCode = 0xE0
-            insCode |= convertReg(args[0]) << 2
-            ImmVal = hex(args[1])[2::]
-            output[currentAddress] = insCode
-            output[currentAddress + 1] = ImmVal
-            currentAddress += 2
-            listOutput[listIndex] = line;
-            listIndex += 2
-    elif("$" in line):
-        sublines = line.split(" ")
-        #This is a instruction that deals with memory
-        ins = sublines[0]
-        args = sublines[1:]
-        if(ins == "ADD"):
-            #Add
-            insCode = 0xA0
-            argA = regCode(args[0]) << 4 | regCode(args[1]) << 2;
+for currentLine in inputLines:
+    pass
+    instruction = currentLine.split(" ")[0]
+    if(instruction == "jmp"):
+        linesToResolve.append([outputIndex, currentLine])
+        outputIndex += 3
+    elif(instruction == "bne"):
+        linesToResolve.append([outputIndex, currentLine])
+        outputIndex += 3
+    elif(instruction == "beq"):
+        linesToResolve.append([outputIndex, currentLine])
+        outputIndex += 3
+    elif(instruction == "jsr"):
+        linesToResolve.append([outputIndex, currentLine])
+        outputIndex += 3
+    elif(instruction == "jse"):
+        linesToResolve.append([outputIndex, currentLine])
+        outputIndex += 3
+    elif(instruction == "jsn"):
+        linesToResolve.append([outputIndex, currentLine])
+        outputIndex += 3
+    elif(instruction == "nop"):
+        output[outputIndex] = 0
+        outputIndex += 1
+    elif(instruction == "brk"):
+        output[outputIndex] = 0xFF
+        outputIndex += 1
+    elif(instruction == "hlt"):
+        output[outputIndex] = 0xF7
+        outputIndex += 1
+    elif(instruction == "ctn"):
+        output[outputIndex] = 0xFE
+        outputIndex += 1
+    elif(instruction == "rst"):
+        output[outputIndex] = 0xF9
+        outputIndex += 1
+    elif(instruction == "ret"):
+        output[outputIndex] = 0x8C
+        outputIndex += 1
+    elif(instruction == "lsl"):
+        output[outputIndex] = 0b01010100 | getReg(currentLine.split(" ")[1])
+        outputIndex += 1
+    elif(instruction == "lsr"):
+        output[outputIndex] = 0b01010101 | getReg(currentLine.split(" ")[1])
+        outputIndex += 1
+    elif(instruction == "psh"):
+        output[outputIndex] = 0xC1
+        outputIndex += 1
+        output[outputIndex] = getReg(currentLine.split(" ")[1]) << 6
+        outputIndex += 1
+    elif(instruction == "pop"):
+        output[outputIndex] = 0xC2
+        outputIndex += 1
+        output[outputIndex] = getReg(currentLine.split(" ")[1]) << 6
+        outputIndex += 1  
+    elif(instruction[::1] == "LD"):
         pass
+## Pass II: Resolve Label Locations
 
-    
+
+## Pass III: Resolve Jump Instructions
+
+
+## Write files

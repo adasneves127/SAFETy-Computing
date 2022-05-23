@@ -7,12 +7,6 @@ ADD:
 (ADD A B)
 (ADD A #5)
 
-LSR:
-    (010101 (R1))          5 (0b01) (R)
-LSL:
-    (010100 (R1))          5 (0b00) (R)
-
-
 SUB:
     (10100101 xx00xx00)             A5 (R1)(R2) -- Subtract R2 from R1
     (101011xx ########)             A (0b11) (R1)  (I1 (8b)) -- Subtract Immediate
@@ -34,14 +28,6 @@ DEC:
 TRANSFER:
     (11000000 xx00xx00)             C0 (R1) 00 (R2) 00
 (TAB, TAX, TAY, TBA, TBX, TBY, TXA, TXB, TXY, TYA, TYB, TYX)
-
-PSH:
-    (11000001 xx000000)             C1 (R1)
-(PSH A)
-
-POP:
-    (11000010 xx000000)             C2 (R1)
-(POP A)
 
 LOAD:
                                     (4, 5, 5, 6)
@@ -83,25 +69,6 @@ JSN
     (10001110 $$$$$$$$ $$$$$$$$)    8E (Mem) -- JSR on Not Equals
 (JSN $4000)
 
-RET
-    (10001100)                      8C
-(RET)
-
 JMP 
     (01110000 $$$$$$$$ $$$$$$$$)    70 (Mem)
 (JMP $4000)
-
-NOP -- No Operation
-    00
-
-BRK -- Breakpoint
-    FF
-
-CTN -- Resume from Breakpoint
-    FE
-
-HLT -- Halt the CPU
-    F7
-
-RST -- Reset
-    F9
