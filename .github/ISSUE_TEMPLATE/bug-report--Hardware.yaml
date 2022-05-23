@@ -1,6 +1,6 @@
-name: Bug Report
+name: Bug Report [Hardware]
 description: File a bug report
-title: "[Bug]: "
+title: "[Hardware Bug]: "
 labels: ["bug", "hardware"]
 body:
   - type: markdown
