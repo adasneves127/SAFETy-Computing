@@ -73,7 +73,7 @@ To run the simulator, navigate to ./Software/Simulator, and run ```make```
 
 After that, run it with ```./Sim <input file>```
 
-```make clean``` will remove all .o files, as well as the output from `make`.
+```make clean``` will remove all .o files, as well as the compiled file.
 
 # Change Log
 
