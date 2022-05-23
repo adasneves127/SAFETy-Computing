@@ -27,7 +27,7 @@ def getReg(reg: str):
         return -1   
 
 #Imports
-import sys, binascii
+import sys
 
 #Every label must have one of these characters
 requiredChars = ["g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
@@ -95,7 +95,7 @@ else:
 inputLines = []
 
 #All label locations and names
-labels = []
+labelsToResolve = []
 
 #All jump instruction locations
 linesToResolve = []
@@ -112,7 +112,8 @@ with open() as fileIn:
 ## Pass I: Resolve everything except for jump instructions.
 
 for currentLine in inputLines:
-    pass
+    if "." in currentLine:
+        labelsToResolve.append([outputIndex, currentLine])
     instruction = currentLine.split(" ")[0]
     if(instruction == "jmp"):
         linesToResolve.append([outputIndex, currentLine])
@@ -166,8 +167,99 @@ for currentLine in inputLines:
         outputIndex += 1
         output[outputIndex] = getReg(currentLine.split(" ")[1]) << 6
         outputIndex += 1  
-    elif(instruction[::1] == "LD"):
-        pass
+    elif(instruction[::1] == "ld"):
+        Reg = getReg(currentLine[-1])
+        if(Reg == -1):
+            print(f"Invalid Register on line: \"{currentLine}\"")
+            sys.exit(1)
+        AddrOrImm = currentLine.split(" ")[1]
+        if "#" in AddrOrImm:
+            output[outputIndex] = 0xC4 | Reg
+            outputIndex += 1
+            output[outputIndex] = int(AddrOrImm[1:])
+            outputIndex += 1
+        else:
+            output[outputIndex] = 0xC8 | Reg
+            outputIndex += 1
+            addr = findBELEcode(AddrOrImm)
+            output[outputIndex] = addr[0]
+            outputIndex += 1
+            output[outputIndex] = addr[1]
+            outputIndex += 1
+    elif(instruction[::1] == "st"):
+        Reg = getReg(currentLine[-1])
+        if(Reg == -1):
+            print(f"Invalid Register on line: \"{currentLine}\"")
+            sys.exit(1)
+        AddrOrImm = currentLine.split(" ")[1]
+        if "$" in AddrOrImm:
+            output[outputIndex] = 0xCC | Reg
+            outputIndex += 1
+            addr = findBELEcode(AddrOrImm)
+            output[outputIndex] = addr[0]
+            outputIndex += 1
+            output[outputIndex] = addr[1]
+            outputIndex += 1
+        else:
+            print(f"Invalid Address on line: \"{currentLine}\"")
+            sys.exit(1)
+    elif(instruction[0] == "t"):
+        Reg1 = getReg(currentLine[1])
+        Reg2 = getReg(currentLine[2])
+        if(Reg1 == -1 or Reg2 == -1):
+            print(f"Invalid Register on line: \"{currentLine}\"")
+            sys.exit(1)
+        output[outputIndex] = 0xC0
+        outputIndex += 1
+        output[outputIndex] = Reg1 << 4 | Reg2
+        outputIndex += 1
+    elif(instruction == "add"):
+        Reg1 = getReg(currentLine.split(" ")[1])
+        Reg2 = getReg(currentLine.split(" ")[2])
+        if(Reg1 == -1):
+            print(f"Invalid Register on line: \"{currentLine}\"")
+            sys.exit(1)
+        if(Reg2 == -1):
+            #This is an immediate value!
+            Reg2 = currentLine.split(" ")[2]
+            output[outputIndex] = 0xA8 | Reg1
+            outputIndex += 1
+            output[outputIndex] = Reg2
+            outputIndex += 1
+        else:
+            output[outputIndex] = 0xA0
+            outputIndex += 1
+            output[outputIndex] = Reg1 << 4 | Reg2
+            outputIndex += 1
+    elif(instruction == "sub"):
+        Reg1 = getReg(currentLine.split(" ")[1])
+        Reg2 = getReg(currentLine.split(" ")[2])
+        if(Reg1 == -1):
+            print(f"Invalid Register on line: \"{currentLine}\"")
+            sys.exit(1)
+        if(Reg2 == -1):
+            #This is an immediate value!
+            Reg2 = currentLine.split(" ")[2]
+            output[outputIndex] = 0xAC | Reg1
+            outputIndex += 1
+            output[outputIndex] = Reg2
+            outputIndex += 1
+        else:
+            output[outputIndex] = 0xA5
+            outputIndex += 1
+            output[outputIndex] = Reg1 << 4 | Reg2
+            outputIndex += 1
+    elif(instruction == "inc"):
+        Reg = getReg(currentLine.split(" ")[1])
+        if(Reg == -1):
+            output[outputIndex] = 0xB4
+            outputIndex += 1
+            
+        else:   
+            output[outputIndex] = 0xA1 | Reg
+            outputIndex += 1
+        
+
 ## Pass II: Resolve Label Locations
 
 

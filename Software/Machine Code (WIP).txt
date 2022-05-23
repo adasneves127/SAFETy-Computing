@@ -1,18 +1,5 @@
 Machine Code:
 
-
-ADD:
-   (10100000 xx00xx00)              A0 (R1)(R2) -- Add 2 registers
-   (101010xx ########)              A (0b10) (R1) (I1 (8b)) -- Add Immediate
-(ADD A B)
-(ADD A #5)
-
-SUB:
-    (10100101 xx00xx00)             A5 (R1)(R2) -- Subtract R2 from R1
-    (101011xx ########)             A (0b11) (R1)  (I1 (8b)) -- Subtract Immediate
-(SUB A B)
-(SUB A #5)
-
 INC:
     (10100010 xx000000)             A2 (R1) 00  -- Increment R1 
     (10110100 $$$$$$$$ $$$$$$$$)    B4 (MEM) -- Increment Memory Address
@@ -24,23 +11,6 @@ DEC:
     (10111111 $$$$$$$$ $$$$$$$$)    B8 (MEM) -- Decrement Memory Address
 (DEC A)
 (DEC $4000)
-
-TRANSFER:
-    (11000000 xx00xx00)             C0 (R1) 00 (R2) 00
-(TAB, TAX, TAY, TBA, TBX, TBY, TXA, TXB, TXY, TYA, TYB, TYX)
-
-LOAD:
-                                    (4, 5, 5, 6)
-    (110001xx ########)             C (0b01) (R1)   (I1 (8b))
-(LDA #100)
-                                    (8, 9, A, B)
-    (110010xx $$$$$$$$ $$$$$$$$)    C (0b10) (R1)   (MEM) 0000
-(LDA $4000)
-
-ST:
-                                    (C, D, E, F)
-    (110011xx $$$$$$$$ $$$$$$$$)    C (0b11) (R1)   (MEM)
-(STA $4000)
 
 Comparing and Branching:
 CMP:
