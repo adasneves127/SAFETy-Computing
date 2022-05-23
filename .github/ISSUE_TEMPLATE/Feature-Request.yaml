@@ -19,11 +19,11 @@ body:
     id: version
     attributes:
       label: Version
-      description: Is this a Hardware, or a Software request?
+      description: Is this a Hardware or Software request?
       options:
         - Hardware
         - Software
-      validations:
+    validations:
       required: true
   - type: textarea
     id: Describe the request
