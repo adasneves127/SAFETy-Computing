@@ -32,16 +32,14 @@ body:
       placeholder: ex. CommitID/Branch
     validations:
       required: true
-  - type: dropdown
-    id: browsers
+  - type: input
+    id: sheetName
     attributes:
-      label: What browsers are you seeing the problem on?
-      multiple: true
-      options:
-        - Firefox
-        - Chrome
-        - Safari
-        - Microsoft Edge
+      label: Sheet Name
+      description: What is the name of the sheet or the component where this error is?
+      placeholder: ex. ALU, Chip 15
+    validations:
+      required: true
   - type: textarea
     id: logs
     attributes:
