@@ -1,40 +1,44 @@
 name: Feature Request
-description: Request a feature to be added to this project
-title: "[Feature Request] "
+description: Request a new feature
+title: "Feature Request: "
 labels: ["Feature Request"]
- 
- body:
+body:
   - type: markdown
     attributes:
-      Value: |
-        Thanks for requesting a new feature!
-    - type: input
-      id: contact
-      attributes:
-        label: Contact Details
-        description: How can we get in contact with you for more information?
-        placeholder: ex. email@example.com
-      validations:
-        required: true
-    - type: dropdown
-      id: request-type
-      attributes:
-        label: Is this a hardware or software request?
-         multiple: false
-         options:
-          - Hardware
-          - Software
-    - type: textarea
-      id: version
-      attributes:
-        label: Version
-        description: What version/Branch of this repo are you using?
-        value: "CommitID/Branch"
-    - type: textarea
-      id: describe
-      attrubutes: Describe the feature
-        description: Also tell us, do you have any ideas towards the designing and creation of this feature?
-        placeholder: Information Here!
-      validation:
-        required: true
-      
+      value: |
+        Thanks for taking the time to fill out this Feature Request!
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Details
+      description: How can we get in touch with you if we need more info?
+      placeholder: ex. email@example.com
+    validations:
+      required: false
+  - type: dropdown
+    id: version
+    attributes:
+      label: Version
+      description: Is this a Hardware or Software request?
+      options:
+        - Hardware
+        - Software
+    validations:
+      required: true
+  - type: textarea
+    id: Describe_Request
+    attributes:
+      label: Description
+      description: Also, do you have any design ideas or extra goals for this request?
+      placeholder: Tell us about it!
+      value: "Create an IDE"
+    validations:
+      required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://example.com)
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
