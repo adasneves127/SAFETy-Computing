@@ -1,4 +1,3 @@
-from cProfile import label
 import assemblyDef   #This is the file that contains the assembly instructions
 import sys           #This is the file that contains the command line arguments
 import re
