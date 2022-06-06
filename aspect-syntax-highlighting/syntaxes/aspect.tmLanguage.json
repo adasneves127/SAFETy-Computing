@@ -1,0 +1,48 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "Aspect",
+	"patterns": [
+		{
+			"include": "#comments"
+		},
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#strings"
+		}
+	],
+	"repository": {
+		"comments": {
+			"name": "comment.line.aspect",
+			"begin": ";",
+			"end": "\n",
+			"patterns": [{
+				"name": "punctuation.definition.comment.aspect",
+				"match": ";"
+			}	
+			]
+		},
+		"keywords": {
+			"patterns": [{
+				"name": "keyword.control.aspect",
+				"match": "\\b(?i)((ld|st)(a|b|x|y))|(nop|rst|hlt|brk|ctn)|(cl(c|n|z|v|i))|(ls(l|r))\\b"
+			},{
+				"name": "keyword.operator.aspect",
+				"match": "\\b(or|and|not)\\b"
+			}]
+		},
+		"strings": {
+			"name": "string.quoted.double.aspect",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.aspect",
+					"match": "\\\\."
+				}
+			]
+		}
+	},
+	"scopeName": "source.aspect"
+}
