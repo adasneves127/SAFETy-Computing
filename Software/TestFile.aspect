@@ -1,0 +1,34 @@
+lda $0
+sta $0
+
+nop
+rst
+hlt
+brk
+ctn
+clc
+cln
+clz
+clv
+cli
+lsl a
+lsr b
+add x #0
+sub y #0
+
+inc a
+dec b
+psh x
+pop y
+or a a
+not a
+tax
+jmp $0000
+add a b
+sub a b
+
+inc $0010
+dec $0020
+
+cmp a b
+cmp a #00

@@ -208,3 +208,20 @@ All noteable changes for this project will be documented within this file.
 ## 5/22/22
 
 - Transitioned `build.sh` to `make`
+
+
+## [V2.3]
+
+### Added
+- Added IO to the 
+
+### Removed
+
+- Removed old versions of the assebler.
+
+### Changed
+
+- Rewrote Assembler to be more efficient and intuitive.
+  - Assembler now uses a dependency file, which is a file that contains all opcodes, as well as reserved labels.
+- Changed layout of instructions to be more efficient and intuitive.
+- Reworked the simulator to use the new commands.

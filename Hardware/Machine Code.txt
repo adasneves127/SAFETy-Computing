@@ -94,8 +94,11 @@ JMP
 NOP -- No Operation
     00
 
-BRK -- Break
+BRK -- Breakpoint
     FF
+
+CTN -- Resume from Breakpoint
+    FE
 
 HLT -- Halt the CPU
     F7

@@ -1,0 +1,44 @@
+Machine Code:
+
+INC:
+    (10100010 xx000000)             A2 (R1) 00  -- Increment R1 
+    (10110100 $$$$$$$$ $$$$$$$$)    B4 (MEM) -- Increment Memory Address
+(INC A)
+(INC $4000) 
+
+DEC:
+    (10110111 xx000000)             B7 (R1) 00 -- Decrement R1
+    (10111111 $$$$$$$$ $$$$$$$$)    B8 (MEM) -- Decrement Memory Address
+(DEC A)
+(DEC $4000)
+
+Comparing and Branching:
+CMP:
+    (1101xxxx)                      D (R1) (R2)  -- Compare 2 registers
+    (1110xx00 ########)             E (R1) (0x00) (I1) -- Compare immediate
+(CMP A B)
+(CMP A #5)
+
+BNE
+    (00110000 $$$$$$$$ $$$$$$$$)    30 (Mem) -- Branch if last result did not produce a zero
+(BNE $4000)
+
+BEQ
+    (00110001 $$$$$$$$ $$$$$$$$)    31 (Mem) -- Branch if last result did produce a zero
+(BEQ $4000)
+
+JSR
+    (10001011 $$$$$$$$ $$$$$$$$)    8B (Mem)
+(JSR $4000)
+
+JSE
+    (10001101 $$$$$$$$ $$$$$$$$)    8D (Mem) -- JSR on Equals
+(JSE $4000)
+
+JSN
+    (10001110 $$$$$$$$ $$$$$$$$)    8E (Mem) -- JSR on Not Equals
+(JSN $4000)
+
+JMP 
+    (01110000 $$$$$$$$ $$$$$$$$)    70 (Mem)
+(JMP $4000)
