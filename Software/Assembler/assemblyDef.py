@@ -14,10 +14,6 @@ reservedLabels = {
     "PROGHIGH": 0x7FFF,
 }
 
-reservedVariables = {
-    "SP": 0x0100,
-}
-
 #List of all op codes, with their lengths, and machine code conversions.
 #Should someone wish to change the op codes, they should only need to change the
 #assembly codes, and recompile the program.

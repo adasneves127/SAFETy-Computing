@@ -100,7 +100,7 @@ labelsToResolve = []
 #All jump instruction locations
 linesToResolve = []
 
-output = [0] * 65536
+output = [0] * 0x8000
 
 outputIndex = 0;
 

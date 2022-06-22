@@ -1,19 +1,7 @@
 $0000 - $00ff:
-    Monitor Code?
 $0100 - $01ff:
-    Stack
 $0200 - $05FF:
-    $0200 - 05e8:
-        Screen memory
-    $05e9:
-        Screen line index
-
 $0600 - $06ff:
-    IO Ports
-        $0401 - $0405:
-            Data Direction. Each bit will be one port.
-        $0406 - 040a:
-            Data Out
 $0700 - $07ff:
 $0800 - $08ff:
 $0900 - $09ff:
@@ -72,7 +60,6 @@ $3d00 - $3dff:
 $3e00 - $3eff:
 $3f00 - $3fff:
 $4000 - $50ff:
-    Open memory for programming
 $5100 - $51ff:
 $5200 - $52ff:
 $5300 - $53ff:
@@ -116,15 +103,17 @@ $7800 - $78ff:
 $7900 - $79ff:
 $7a00 - $7aff:
 $7b00 - $7bff:
-$7c00 - $7cff:
-$7d00 - $7dff:
-$7e00 - $7eff:
-$7f00 - $7fff:
+$7c00 - $7Fff:
+    Video Memory
+    $7c00 - 0x7fe8:
+        Screen Memory
+    $7fe9: Screen Line Index
+    $7fea - 7fff:
+        Marked for later usage.
 
 
 ROM:
 $8000 - $a0ff:
-    BASIC?
 $a000 - $a0ff:
 $a100 - $a1ff:
 $a200 - $a2ff:
@@ -217,6 +206,19 @@ $fb00 - $fbff:
 $fc00 - $fcff:
 $fd00 - $fdff:
 $fe00 - $feff:
-$ff00 - $ffff:
-    $ffef:
-        Reset Vector?
+    $fef0 - $fefe:
+        IO Space
+        
+        $fef7 - $fefd:
+            IO Ports
+            $fef7: LCD Character Display
+            $fef8: Keyboard
+            $fef9 - $fefd:
+                Unused
+
+        $fefe: Data Direction "register"
+
+    $feff: Bank Selector
+$ff00 - $ffff: (Changing Memory)
+    Banked Memory (256 x 256 bytes) (64k)
+    

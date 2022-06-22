@@ -12,6 +12,8 @@ class ALU{
         unsigned char CMP(Register r1, Register r2);
         unsigned char INC(Register r1);
         unsigned char DEC(Register r1);
+        unsigned char NAND(Register r1, Register r2);
+
 
         unsigned char ADD(Register r1, unsigned char val);
         unsigned char SUB(Register r1, unsigned char val);

@@ -6,9 +6,14 @@ class Mem{
         0x0100 - 0x01FF: Stack (0x0100 is bottom of stack)
     */
     public:
-        unsigned char mem[0xFFFF];
+       
         Mem();
         unsigned char read(unsigned short address);
        
         void write(unsigned char value, unsigned short address);
+    private:
+        unsigned char memPageA;
+        unsigned char memPageB;
+        unsigned char mem[0xFFFF];
+        unsigned char pagedMem[0xFF][0xFF][0xFF];
 };

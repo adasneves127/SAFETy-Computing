@@ -14,22 +14,29 @@ void ALU::updateFlags(unsigned char flags){
 }
 
 
+unsigned char ALU::NAND(Register r1, Register r2){
+    unsigned char result = r1.get() & r2.get();
+    r1.set((unsigned char)~result);
+    updateFlags(~result);
+    return flags;
+}
+
 unsigned char ALU::ADD(Register r1, Register r2){
     unsigned char pre1 = r1.get();
     unsigned char pre2 = r2.get();
     r1.set((unsigned char)(r1.get() + r2.get()));
 
     if(pre1 < 0x0F && r1.get() > 0x0F){
-        flags |= 0x00010000;
+        flags |= 0b00010000;
     }
     if(r1.get() == 0){
         //         CNZVI000
-        flags |= 0x00100000;
+        flags |= 0b00100000;
     } else {
-        flags |= 0x01000000;
+        flags |= 0b01000000;
     }
     if(pre1 > r1.get()){
-        flags |= 0x10000000;
+        flags |= 0b10000000;
     }
     return flags;
 }

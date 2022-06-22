@@ -47,6 +47,11 @@ Mem mem;
 bool halted = false;
 
 Register regs[] = {reg.A, reg.B, reg.X, reg.Y};
+char regNames[] = "abcd";
+
+bool debug = false;
+bool inBreak = false;
+
 #pragma endregion
 
 #pragma region Function Prototypes 
@@ -58,9 +63,18 @@ void push(unsigned char Data);
 unsigned char pop();
 void graphicsDraw();
 void drawToScreen(char line[]);
+void printDebug();
+
 #pragma endregion
 
 int main(int argc, char* argv[]){
+
+    if(argc == 2){
+        if(*argv[0] == 'd'){
+            debug = true;
+        }
+    }
+
     //Initialize Registers to be the correct size.
     reg.A.setType(true);
     reg.B.setType(true);
@@ -74,13 +88,31 @@ int main(int argc, char* argv[]){
         readFile(argv);
     }
     else{
+        std::cout << "No file specified!" << std::endl;
         return 0;
     }
 
     while(!halted && (reg.PC.get() <= 65535)){
         doInstruction();
+        if(debug){
+            printDebug();
+        }
     }
 
+}
+
+void printDebug(){
+    std::cout << "Debug Info: " << std::endl;;
+    for(int i = 0; i < 4; i++){
+        std::cout << regNames[i] << ": " << regs[i].get() << ", ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "Flags: " << alu.flags << std::endl;
+
+    std::cout << "PC: " << reg.PC.get() << std::endl;
+    std::cout << "INS: " << reg.INS.get() << std::endl;
+    std::cout << "SP: " << reg.SP.get() << std::endl << std::endl;
 }
 
 void readFile(char *argv[]){
@@ -89,8 +121,8 @@ void readFile(char *argv[]){
 	int i=0;
 	//Fill memory with 0xFF (BRK)
 	for(i=0; i<0xFFFF; i++)
-		mem.mem[i]=0x00;
-	i=0;
+		mem.write(0x00, i);
+	i=0x8000;
 
 	
 	
@@ -100,7 +132,7 @@ void readFile(char *argv[]){
 		fscanf(f,"%x\n",&c);
 		
 		unsigned char readIn = (unsigned char)(c & 0xff);
-		mem.mem[i] = readIn;
+		mem.write(readIn, i);
 		//printf("%x\n",mem.mem[i]);
         i++;
 	}
@@ -113,7 +145,7 @@ void readFile(char *argv[]){
 }
 
 void doInstruction(){
-    std::cout << "PC: " << reg.PC.get() << std::endl;
+    
     // Get the instruction
     // Get the opcode
     // Get the operands
@@ -126,133 +158,208 @@ void doInstruction(){
     reg.INS.set(mem.read(reg.PC.get()));
     reg.PC.set((unsigned short)(reg.PC.get() + 1));
 
+    
+
     unsigned char ins = reg.INS.get();
-    std::cout << "INS: " << (int)ins << std::endl;
+    Register RD = regs[(ins >> 2) & 0x3];
+    Register RS = regs[(ins) & 0x3];
+    switch(ins){
+        case 0x00:
+            //NOP
+            break;
+        case 0x01:
+            //RST
+            reset();
+            break;
+        case 0x02:
+            halted = true;
+            break;
+        case 0x03:
+            //BRK
+            inBreak = true;
+            break;
+        case 0x04:
+            //RST
+            inBreak = false;
+            break;
+        case 0x05:
+            alu.flags &= 0b01111111;
+            break;
+        case 0x06:
+            alu.flags &= 0b10111111;
+            break;
+        case 0x07:
+            alu.flags &= 0b11011111;
+            break;
+        case 0x08:
+            alu.flags &= 0b11101111;
+            break;
+        case 0x09:
+            alu.flags &= 0b11110111;
+            break;
+        case 0x10:
+        case 0x14:
+        case 0x18:
+        case 0x1c:
+            //LSL
+            RD.set((unsigned char)(RD.get() << 1));
+            break;
+        case 0x11:
+        case 0x15:
+        case 0x19:
+        case 0x1d:
+            //LSR
+            RD.set((unsigned char)(RD.get() >> 1));
+            break;
+        case 0x12:
+        case 0x16:
+        case 0x1a:
+        case 0x1e:
+            //ADD IMM
+            alu.ADD(RD, (unsigned char)readMemIncPC());
+            break;
+        case 0x13:
+        case 0x17:
+        case 0x1b:
+        case 0x1f:
+            //SUB IMM
+            alu.SUB(RD, (unsigned char)readMemIncPC());
+            break;
+        case 0x20:
+        case 0x24:
+        case 0x28:
+        case 0x2c:
+            //INC
+            alu.ADD(RD, 1);
+            break;
+        case 0x21:
+        case 0x25:
+        case 0x29:
+        case 0x2d:
+            //DEC
+            alu.SUB(RD, 1);
+            break;
+        case 0x30:
+        case 0x34:
+        case 0x38:
+        case 0x3c:
+            //POP
+            RD.set(pop());
+            break;
+        case 0x61:
+        case 0x62:
+        case 0x63:
+        case 0x64:
+        case 0x66:
+        case 0x67:
+        case 0x68:
+        case 0x69:
+        case 0x6b:
+        case 0x6c:
+        case 0x6d:
+        case 0x6e:
+            //TRANSFER
+            RD.set(RS.get());
+            break;
+        case 0x70:
+            //JMP
+            reg.PC.set((unsigned short)(readMemIncPC() << 8 | readMemIncPC()));
+            break;
+        case 0x71:
+            //JSR
+            push((unsigned char)(reg.PC.get() >> 8));
+            push((unsigned char)(reg.PC.get() & 0xFF));
+            reg.PC.set((unsigned short)(readMemIncPC() << 8 | readMemIncPC()));
+            break;
+        case 0x72:
+            //RET
+            reg.PC.set((unsigned short)(pop() | (pop() << 8)));
+            break;
+        case 0x73:
+            //JSE
+            if(alu.flags & 0b10000000){
+                push((unsigned char)(reg.PC.get() >> 8));
+                push((unsigned char)(reg.PC.get() & 0xFF));
+                reg.PC.set((unsigned short)(readMemIncPC() << 8 | readMemIncPC()));
+            }
+            break;
+        case 0x74:
+            //JSN
+            if((alu.flags & 0b01000000)){
+                push((unsigned char)(reg.PC.get() >> 8));
+                push((unsigned char)(reg.PC.get() & 0xFF));
+                reg.PC.set((unsigned short)(readMemIncPC() << 8 | readMemIncPC()));
+            }
+            break;
+        case 0x75:
+            //JSL
+            if(alu.flags & 0b10000000){
+                reg.PC.set((unsigned short)(readMemIncPC() << 8 | readMemIncPC()));
+            }
+            break;
+        case 0x76:
+            //BEQ
+            if(!(alu.flags & 0b01000000)){
+                push((unsigned char)(reg.PC.get() >> 8));
+            }
+            break;
+        case 0x80:
+        case 0x81:
+        case 0x82:
+        case 0x83:
+        case 0x84:
+        case 0x85:
+        case 0x86:
+        case 0x87:
+        case 0x88:
+        case 0x89:
+        case 0x8a:
+        case 0x8b:
+        case 0x8c:
+        case 0x8d:
+        case 0x8e:
+        case 0x8f:
+            alu.ADD(RD, RS);
+            break;
 
-    if(ins == 0xA0){ //Add 2 Registers
-        unsigned char nextIns = readMemIncPC();
-        unsigned char R1 = nextIns >> 6;
-        unsigned char R2 = (nextIns & 0xF) >> 2;
-        reg.flags = alu.ADD(regs[R1], regs[R2]);
+        case 0x90:
+        case 0x91:
+        case 0x92:
+        case 0x93:
+        case 0x94:
+        case 0x95:
+        case 0x96:
+        case 0x97:
+        case 0x98:
+        case 0x99:
+        case 0x9a:
+        case 0x9b:
+        case 0x9c:
+        case 0x9d:
+        case 0x9e:
+        case 0x9f:
+            alu.SUB(RD, RS);
+            break;
 
-    } else if((ins & 0b11111100) == 0b10101000){ //Registers Addition
-        // ADD
-        unsigned char reg1 = (ins & 0b00000011);
-        unsigned char data = readMemIncPC();
-        reg.flags = (alu.ADD(regs[reg1], data));
+        case 0xa0:
+        case 0xa1:
+        case 0xa2:
+        case 0xa3:
+        case 0xa4:
+        case 0xa5:
+        case 0xa6:
+        case 0xa7:
+        case 0xa8:
+        case 0xa9:
+        case 0xaa:
+        case 0xab:
+        case 0xac:
+        case 0xad:
+        case 0xae:
+        case 0xaf:
+            alu.SUB(RD, RS);
+            break;
         
-    } else if(ins == 0xF7){ //HLT
-        halted = true;
-        std::cout << "HALT" << std::endl;
-    } else if (ins == 0xC1){ // Push
-        push(regs[mem.read(reg.PC.get()) >> 6].get());
-        reg.PC.set((unsigned char)(reg.PC.get() + 1));
-    } else if (ins == 0xC2){ // Pop
-        unsigned char RegData = mem.read(reg.PC.get()) >> 6;
-        regs[RegData].set(pop());
-    } else if ((ins & 0b11111100) == 0b01010100){ // LSR
-        regs[ins & 0b11].set((unsigned short)(regs[ins & 0b11].get() >> 1));
-    } else if ((ins & 0b11111100) == 0b01010000){ // LSL
-        regs[ins & 0b11].set((unsigned char)(regs[ins & 0b11].get() << 1));
-    } else if (ins == 0x8C){ // RET
-        unsigned char UN = pop(); // Get the high byte
-        unsigned char LN = pop(); // Get the low byte
-        unsigned short addr = (UN << 8) | LN; // Combine the bytes
-        reg.PC.set(addr); // Set the PC
-    } else if (ins == 0x70){ // JMP
-        unsigned char LN = readMemIncPC(); // Get the low byte
-        unsigned char UN = readMemIncPC(); // Get the high byte
-        unsigned short addr = (UN << 8) | LN; // Combine the bytes
-        reg.PC.set(addr); // Set the PC
-    } else if(ins == 0xA2){ // Increment Register
-        unsigned char data = readMemIncPC() >> 6; // Get the register
-        reg.flags |= alu.INC(regs[data]); // Increment the register
-    } else if(ins == 0xB4){ // Increment Mem Addr
-        unsigned char LN = readMemIncPC(); // Get the low byte
-        unsigned char UN = readMemIncPC(); // Get the high byte
-        unsigned short addr = (UN << 8) | LN; // Combine the bytes
-        reg.flags |= alu.INC(addr, mem.mem);
-    } else if(ins == 0xB7){ //Register Decrement
-        unsigned char data = readMemIncPC() >> 6; // Get the register
-        reg.flags |= alu.INC(regs[data]); // Increment the register
-    } else if(ins == 0xB8) { // Mem Decrement
-        unsigned char LN = readMemIncPC(); // Get the low byte
-        unsigned char UN = readMemIncPC(); // Get the high byte
-        unsigned short addr = (UN << 8) | LN; // Combine the bytes
-        reg.flags |= alu.DEC(addr, mem.mem);
-    }else if(ins == 0x25){ //CLC
-        reg.flags = reg.flags & 0b01111111;
-    } else if(ins == 0x26){ //CLN
-        reg.flags = reg.flags & 0b10111111;
-    } else if(ins == 0x27){ //CLZ
-        reg.flags = reg.flags & 0b11011111;
-    } else if(ins == 0x28){ //CLV
-        reg.flags = reg.flags & 0b11101111;
-    } else if(ins == 0x29){ //CLI
-        reg.flags &= 0b11110111;
-    } else if(ins == 0x3A){ //SIF
-        reg.flags |= 0b00001000;
-    } else if(ins == 0x8E){ //JSN
-        if((reg.flags & 0b01000000) == 0b10000000){
-            unsigned char LN = readMemIncPC(); // Get the low byte
-            unsigned char UN = readMemIncPC(); // Get the high byte
-            unsigned short addr = (UN << 8) | LN; // Combine the bytes
-            push((unsigned char)(reg.PC.get() >> 8));
-            push((unsigned char)(reg.PC.get() & 0xFF));
-            reg.PC.set(addr); // Set the PC
-        }
-    } else if(ins == 0x8D){ //JSE
-        if((reg.flags & 0b00100000) == 0b00100000){
-            unsigned char LN = readMemIncPC(); // Get the low byte
-            unsigned char UN = readMemIncPC(); // Get the high byte
-            unsigned short addr = (UN << 8) | LN; // Combine the bytes
-            push((unsigned char)(reg.PC.get() >> 8));
-            push((unsigned char)(reg.PC.get() & 0xFF));
-            reg.PC.set(addr); // Set the PC
-        }
-    } else if(ins == 0x8B){ //JSR
-        unsigned char LN = readMemIncPC();
-        unsigned char UN = readMemIncPC();
-        unsigned short addr = (UN << 8) | LN;
-        push((unsigned char)(reg.PC.get() >> 8));
-        push((unsigned char)(reg.PC.get() & 0xFF));
-        reg.PC.set(addr);
-    } else if(ins == 0x31){ //BEQ
-        if((reg.flags & 0b00100000) == 0b00100000){
-            unsigned char LN = readMemIncPC();
-            unsigned char UN = readMemIncPC();
-            unsigned short addr = (UN << 8) | LN;
-            reg.PC.set(addr);
-        }
-    } else if(ins == 0x30){ //BNE
-        if((reg.flags & 0b01000000) == 0b01000000){
-            unsigned char LN = readMemIncPC();
-            unsigned char UN = readMemIncPC();
-            unsigned short addr = (UN << 8) | LN;
-            reg.PC.set(addr);
-        }
-    } else if((ins & 0xF0) == 0xD0){ // Compare
-        unsigned char R1 = (ins & 0b00001100) >> 2;
-        unsigned char R2 = (ins & 0b00000011);
-        reg.flags |= alu.CMP(regs[R1], regs[R2]);
-    } else if((ins & 0b11001100) == 0xCC){ //Store
-        unsigned char LN = readMemIncPC();
-        unsigned char UN = readMemIncPC();
-        unsigned short addr = (UN << 8) | LN;
-        mem.write(addr, regs[ins & 0b11].get());
-    } else if((ins & 0b11001000) == 0xC8){ // Load from Mem
-        unsigned char LN = readMemIncPC();
-        unsigned char UN = readMemIncPC();
-        unsigned short addr = (UN << 8) | LN;
-        regs[ins & 0b11].set(mem.read(addr));
-    } else if((ins & 0xC4) == 0xC4){ // Load Imm
-        unsigned char data = readMemIncPC();
-        regs[ins & 0b11].set(data);
-    } else if(ins == 0xC0){
-        unsigned char data = readMemIncPC();
-        unsigned char R1 = ins >> 6;
-        unsigned char R2 = (ins & 0b1100) >> 2;
-        regs[R1].set(regs[R2].get());
     }
 
     //halted = true;
@@ -266,15 +373,14 @@ void reset(){
 
 // Push to the stack, and increment SP
 void push(unsigned char Data){
-    mem.mem[reg.SP.get() + 0x100] = Data;
+    mem.write(Data, 0x100 + reg.SP.get());
     reg.SP.set((unsigned char)(reg.SP.get() + 1));
 }
 
 // Pop from the stack, and decrement SP. Returns the popped value
 unsigned char pop(){
     reg.SP.set((unsigned short)(reg.SP.get() - 1));
-    unsigned char Data = mem.mem[reg.SP.get() + 100];
-    mem.mem[reg.SP.get() + 0x100] = 0x00;
+    unsigned char Data = mem.read(reg.SP.get() + 100);
     return Data;
     
 }
@@ -291,8 +397,7 @@ void graphicsMove(){
     for(int i = 1; i < 24; i++){
         for(int j = 0; j < 40; j++){
             //Copy the current line to the previous line
-            mem.mem[0x200 + ((i-1) * 24) + j] = mem.mem[0x200 + (i * 24) + j];
-            mem.mem[0x200 + (i * 24) + j] = 0x00;
+            mem.write(mem.read(0x200 + (i * 24) + j), 0x200 + ((i-1) * 24) + j);
         }
     }
 }
@@ -355,13 +460,13 @@ void drawToScreen(char line[]){
     //Copy the portions of the string into VidMem
     for(int i = 0; i < count; i++){
         for(int j = 0; j < 40; j++){
-            mem.mem[0x200 + (i * count) + j] = portions[i][j];
+            mem.write(portions[i][j], 0x200 + (i * count) + j);
         }
     }
     //Increment the mem offset
-    mem.mem[0x5E9] = (unsigned char)(mem.read(0x5E9) + count + 1);
+    mem.write((unsigned char)(mem.read(0x5E9) + count + 1), 0x5E9);
     if(mem.read(0x5E9) > 24){
-        mem.mem[0x5E9] = 24;
+        mem.write(0x5E9, 24);
     }
     //If we have drawn 24 lines to the screen, move the screen.
     if(mem.read(0x5E9) >= 24){
