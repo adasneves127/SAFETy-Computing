@@ -1,8 +1,14 @@
-# Read Me
+# What is this?
 
 This repository contains code to interpret and execute a custom assembly code. The specific assembly code is provided in the 'assembly.txt' file.
 
 To convert assembly code into machine code, use DALAssembler.py.
+
+## Why SAFETy?
+
+This project was inspired by (Dr. Margaret Black)[github.com/mdblack]'s RISCy Computer. A suggestion posed by her daughter was to name it "SAFETy", as it is the opposite of RISCy.
+
+##Important Information
 
 Memory Addresses are stored in the 'memory.txt' file.
 All memory addresses are stored in hexadecimal. All addresses are 16 bits long.
@@ -17,11 +23,12 @@ Please read and understand the terms and rules set in the Contributions file, as
 
 ## Assembly
 
-Assembly files have the file extension of .DAL
+Assembly files have the file extension of .SASM
 
 ### Machine Code
 
-Machine code files end with .dal.txt, .dal.lst, and .dal.bin. Addresses in MC are Little Endian.
+Machine code files end with .safe.txt, .safe.lst, and .safe.bin. Addresses in MC are Little Endian.
+Other instructions are .safeteh, which is a "SAFETy Extra Header"
 
 ### Schematics
 
