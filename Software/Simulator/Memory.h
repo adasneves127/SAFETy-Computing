@@ -14,6 +14,6 @@ class Mem{
     private:
         unsigned char memPageA;
         unsigned char memPageB;
-        unsigned char mem[0xFFFF];
+        unsigned char mem[0xFF00];
         unsigned char pagedMem[0xFF][0xFF][0xFF];
 };

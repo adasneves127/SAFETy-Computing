@@ -179,7 +179,7 @@ void doInstruction(){
             inBreak = true;
             break;
         case 0x04:
-            //RST
+            //CTN
             inBreak = false;
             break;
         case 0x05:
@@ -358,6 +358,33 @@ void doInstruction(){
         case 0xae:
         case 0xaf:
             alu.SUB(RD, RS);
+            break;
+        case 0xb0:
+        case 0xb1:
+        case 0xb2:
+        case 0xb3:
+            //PUSH
+            push(RS.get());
+            break;
+        case 0xB4:
+            //Inc Mem
+            push(regs[0].get());
+            regs[0].set(readMemIncPC());
+            mem.write(alu.INC(regs[0]), reg.PC.get() - 1);
+            regs[0].set(pop());
+            break;
+        case 0xB7:
+            //Dec Mem
+            push(regs[0].get());
+            regs[0].set(readMemIncPC());
+            mem.write(alu.DEC(regs[0]), reg.PC.get() - 1);
+            regs[0].set(pop());
+        case 0xC0:
+        case 0xC1:
+        case 0xC2:
+        case 0xC3:
+            //Store Reg
+
             break;
         
     }

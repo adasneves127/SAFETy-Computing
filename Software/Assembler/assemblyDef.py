@@ -14,6 +14,14 @@ reservedLabels = {
     "PROGHIGH": 0x7FFF,
 }
 
+
+macros = {
+    "and": ["nand 1 2", "nand 1 1"],
+    "or": ["nand 1 1", "nand 2 2", "nand 2 2"],
+    "xor": ["push 4", "push 3", "push 2", "push 1", "nand 1 1", "t13", "pop 1", "nand 2 2", "t24", "pop 2", "nand 1 4", "nand 2 3", "nand 1 2" "pop 3", "pop 4" ]
+
+}
+
 #List of all op codes, with their lengths, and machine code conversions.
 #Should someone wish to change the op codes, they should only need to change the
 #assembly codes, and recompile the program.

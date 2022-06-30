@@ -1,0 +1,118 @@
+#Forget semicolons ;)
+
+
+
+Set a (it's int32 btw...) equal to 10
+int a = 10
+
+Could you set b, such that it's equal to casting a to a string?;
+
+
+
+
+
+
+if(a ∧ b) { // A AND B
+
+}
+
+if(a ν b){ //A OR B
+
+}
+
+if(a ↮ b){ //A XOR B
+
+}
+
+if(¬ a){ //NOT A
+
+}
+
+if(a ↑ b){ //A NAND B
+
+}
+
+
+a.∀(elem =ᕒ {//For Each Element in A
+
+})
+
+if(∃ a){ //EXISTS A
+
+}
+
+if(∄ a){ //NOT EXISTS A
+
+}
+
+if (a ⊂ b){ //A SUBSET OF B
+
+}
+
+if (a ⊃ b){ //A SUPERSET OF B
+
+}
+
+if (a ⊆ b){ //A EQUALS B
+
+}
+
+if (a > b){ //A is greater than B
+
+}
+
+if (¬(a > b)){ //A is less or equal to B
+
+}
+
+if ((a > b) ν (a ⊆ b)){ //A is greater or equal to B
+
+}
+
+if (¬((a > b) ν (a ⊆ b))){ //A is less than B
+
+}
+
+Could you set p (it's a string btw...) equal to ((∄ a) ∴ b => a) :)
+
+while (⊨){
+
+
+    exit; //break;
+    really exit //sys.exit();
+
+    forward (value) //return value;
+    forward nothing; //return null;
+    keep_calm_and_carry_on; //continue;
+}
+
+Scream(error); //Throw Error;
+
+Ask(); //stdin
+
+Tell(); //stdout
+
+Library file = open Library("fileName", 'mode', LibraryCard);
+
+//LibraryCard is a custom object. Example code below:
+/*
+
+public class LibraryCard{
+    string username;
+    string EncryptedPassword;
+    string UnencryptedPassword;
+    public LibraryCard(){
+
+    }
+
+    public void encryptPass(){
+        EncryptedPassword = "";
+        for(int i = 0; i < UnencryptedPassword.length(); i++){
+            EncryptedPassword += (char)(UnencryptedPassword.charAt(i) + 1);
+        }
+    }
+
+}
+
+*/
+
