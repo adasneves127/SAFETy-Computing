@@ -27,6 +27,16 @@ function setup() {
 
 }
 
+function drawChar(charArr){
+  for(let i = 0; i < charArr.length; i++){
+    for(let j = 0; j < 8; j++){
+      if(charArr[i] & (1 << j)){
+      characterData.toggle(i, j)
+      }
+    }
+  }
+}
+
 function convertChar(){
   
   for( let x = 0; x < resX; x++){
