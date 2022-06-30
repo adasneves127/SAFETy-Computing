@@ -28,14 +28,16 @@ function setup() {
 }
 
 function convertChar(){
-  
+  let data = []
   for( let x = 0; x < resX; x++){
     let charData = "0b";
     for (let i = resY - 1; i >= 0 ; i--) {
       charData += character.data[x][i] ? "1" : "0";
     }
-    print(charData);
+    data.push(charData);
   }
+
+  print(data);
 
 
 
